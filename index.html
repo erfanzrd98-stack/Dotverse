@@ -5,141 +5,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dotverse</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #ffffff;
-            margin: 0;
-            padding: 0;
-            color: #000;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-        }
-        .top-bar {
-            background-color: #f0f2f5;
-            padding: 10px;
-            display: flex;
-            justify-content: space-around;
-            border-bottom: 1px solid #ccc;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            z-index: 100;
-        }
-        .top-bar button {
-            background: none;
-            border: none;
-            font-size: 14px;
-            cursor: pointer;
-            color: #333;
-            font-weight: bold;
-        }
+        body { font-family: Arial, sans-serif; background-color: #ffffff; margin: 0; padding: 0; color: #000; display: flex; flex-direction: column; height: 100vh; }
+        .top-bar { background-color: #f0f2f5; padding: 10px; display: flex; justify-content: space-around; border-bottom: 1px solid #ccc; box-shadow: 0 2px 5px rgba(0,0,0,0.1); z-index: 100; }
+        .top-bar button { background: none; border: none; font-size: 14px; cursor: pointer; color: #333; font-weight: bold; }
         .top-bar button:hover { color: #0056b3; }
-        
-        #chat-container {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-        #room-title {
-            text-align: center;
-            padding: 10px;
-            background: #e0e0e0;
-            font-weight: bold;
-        }
-        #messages {
-            flex: 1;
-            overflow-y: auto;
-            padding: 10px;
-            background: #fff;
-        }
-        .message {
-            margin-bottom: 10px;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 5px;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
+        #chat-container { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        #room-title { text-align: center; padding: 10px; background: #e0e0e0; font-weight: bold; }
+        #messages { flex: 1; overflow-y: auto; padding: 10px; background: #fff; }
+        .message { margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 5px; display: flex; align-items: center; gap: 5px; }
         .message-avatar { font-size: 20px; }
         .message-user { font-weight: bold; margin-left: 5px; }
         .message-text { margin-left: 5px; }
-        
-        #input-area {
-            display: flex;
-            padding: 10px;
-            border-top: 1px solid #ccc;
-            background: #f9f9f9;
-        }
-        #message-input {
-            flex: 1;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            font-family: inherit;
-        }
-        #send-btn {
-            padding: 10px 15px;
-            background: #0056b3;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            margin-left: 10px;
-            cursor: pointer;
-        }
-        
-        .screen {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: #fff;
-            z-index: 200;
-            padding: 20px;
-            overflow-y: auto;
-        }
+        #input-area { display: flex; padding: 10px; border-top: 1px solid #ccc; background: #f9f9f9; }
+        #message-input { flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-family: inherit; }
+        #send-btn { padding: 10px 15px; background: #0056b3; color: white; border: none; border-radius: 5px; margin-left: 10px; cursor: pointer; }
+        .screen { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: #fff; z-index: 200; padding: 20px; overflow-y: auto; }
         .screen.active { display: block; }
-        .close-btn {
-            background: #ff4444;
-            color: white;
-            border: none;
-            padding: 10px;
-            width: 100%;
-            border-radius: 5px;
-            margin-bottom: 20px;
-            cursor: pointer;
-        }
-        input, select {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 15px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            box-sizing: border-box;
-        }
-        .btn {
-            width: 100%;
-            padding: 12px;
-            background: #28a745;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-            margin-bottom: 10px;
-        }
+        .close-btn { background: #ff4444; color: white; border: none; padding: 10px; width: 100%; border-radius: 5px; margin-bottom: 20px; cursor: pointer; }
+        input, select { width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+        .btn { width: 100%; padding: 12px; background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; margin-bottom: 10px; }
         .btn-secondary { background: #007bff; }
         .btn-danger { background: #dc3545; }
-        
-        /* User Rank Colors */
-        .c-blue-light { color: #87CEEB; }
-        .c-pink-light { color: #FFB6C1; }
-        .c-blue-dark { color: #0000AA; }
-        .c-red-dark { color: #CC0000; }
-        .c-purple-light { color: #9370DB; }
-        .c-purple-dark { color: #4B0082; }
-        .c-gray-dark { color: #333333; }
-        .c-yellow { color: #DAA520; }
+        .c-blue-light { color: #87CEEB; } .c-pink-light { color: #FFB6C1; } .c-blue-dark { color: #0000AA; } .c-red-dark { color: #CC0000; }
+        .c-purple-light { color: #9370DB; } .c-purple-dark { color: #4B0082; } .c-gray-dark { color: #333333; } .c-yellow { color: #DAA520; }
         .c-admin { color: #FFD700; font-weight: bold; text-shadow: 0 0 3px #000; }
-        
         .crown::before { content: "👑 "; }
     </style>
 </head>
@@ -234,8 +123,151 @@
         <p>This section is only visible to User 1.</p>
     </div>
 
-    <script>
-        // Firebase and App logic will go here in the next step
+    <!-- Firebase & App Logic -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getDatabase, ref, set, get, child, onValue, push, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+        const firebaseConfig = {
+          apiKey: "AIzaSyDTd3EWgEh6ytP0a_GbWpAvmzpz8z6tPdY",
+          authDomain: "dotverse-12907.firebaseapp.com",
+          databaseURL: "https://dotverse-12907-default-rtdb.firebaseio.com",
+          projectId: "dotverse-12907",
+          storageBucket: "dotverse-12907.firebasestorage.app",
+          messagingSenderId: "342977939027",
+          appId: "1:342977939027:web:8e354d66f5c306ffb428a6",
+          measurementId: "G-CFWWLLTSJR"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        
+        let currentUser = null;
+        let currentRoom = "Lobby";
+        
+        // Make functions global
+        window.openScreen = function(id) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            if(id === 'dots-screen' || id === 'game-screen') {
+                document.getElementById('d-balance').innerText = currentUser.dots;
+                document.getElementById('g-balance').innerText = currentUser.dots;
+            }
+        };
+        window.closeScreens = function() {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        };
+
+        // Auth Functions
+        window.login = function() {
+            const username = document.getElementById('username-input').value.trim();
+            const password = document.getElementById('password-input').value;
+            if(!username || !password) return alert("Enter username and password");
+            
+            get(ref(db, 'users/' + username)).then((snapshot) => {
+                if (snapshot.exists()) {
+                    if(snapshot.val().password === password) {
+                        currentUser = snapshot.val();
+                        startApp();
+                    } else { alert("Wrong password!"); }
+                } else { alert("User not found. Please register."); }
+            });
+        };
+
+        window.register = function() {
+            const username = document.getElementById('username-input').value.trim();
+            const password = document.getElementById('password-input').value;
+            if(!username || !password) return alert("Enter username and password");
+            
+            get(ref(db, 'users/' + username)).then((snapshot) => {
+                if (snapshot.exists()) {
+                    alert("Username already exists!");
+                } else {
+                    get(ref(db, 'meta/userCount')).then(cSnap => {
+                        let count = cSnap.exists() ? cSnap.val() : 1;
+                        if(count >= 10) return alert("Capacity reached (10 users).");
+                        
+                        const newId = count + 1;
+                        const newUserData = {
+                            id: newId, username: username, password: password,
+                            dots: 10, score: 0, joinDate: new Date().toLocaleDateString(),
+                            gender: "male", avatar: "⚽", roomColor: "black"
+                        };
+                        
+                        set(ref(db, 'users/' + username), newUserData).then(() => {
+                            set(ref(db, 'meta/userCount'), newId);
+                            currentUser = newUserData;
+                            startApp();
+                        });
+                    });
+                }
+            });
+        };
+
+        function startApp() {
+            document.getElementById('auth-screen').classList.remove('active');
+            document.getElementById('main-app').style.display = 'flex';
+            
+            if(currentUser.id === 1) {
+                document.getElementById('admin-btn').style.display = 'block';
+            }
+            
+            document.getElementById('p-id').innerText = currentUser.id;
+            document.getElementById('p-score').innerText = currentUser.score;
+            document.getElementById('p-date').innerText = currentUser.joinDate;
+            document.getElementById('p-username').value = currentUser.username;
+            
+            loadMessages();
+        }
+
+        // Chat Functions
+        function loadMessages() {
+            const msgRef = ref(db, 'rooms/' + currentRoom + '/messages');
+            onValue(msgRef, (snapshot) => {
+                const messagesDiv = document.getElementById('messages');
+                messagesDiv.innerHTML = '';
+                snapshot.forEach((childSnapshot) => {
+                    const msg = childSnapshot.val();
+                    const div = document.createElement('div');
+                    div.className = 'message';
+                    div.innerHTML = `<span class="message-avatar">${msg.avatar || '👤'}</span> <span class="message-user">${msg.username}</span>: <span class="message-text">${msg.text}</span>`;
+                    messagesDiv.appendChild(div);
+                });
+                messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            });
+        }
+
+        window.sendMessage = function() {
+            const input = document.getElementById('message-input');
+            const text = input.value.trim();
+            if(!text) return;
+            
+            push(ref(db, 'rooms/' + currentRoom + '/messages'), {
+                username: currentUser.username,
+                avatar: currentUser.avatar,
+                text: text,
+                timestamp: Date.now()
+            });
+            input.value = '';
+        }
+
+        // Dummy functions for now
+        window.updateProfile = function() { alert("Profile update function coming next!"); }
+        window.createRoom = function() { alert("Room creation function coming next!"); }
+        window.sendDots = function() { alert("Send dots function coming next!"); }
+        window.playRoulette = function() { alert("Roulette function coming next!"); }
+
+        // Create DotMaster automatically if not exists
+        get(ref(db, 'users/DotMaster')).then(snap => {
+            if(!snap.exists()) {
+                set(ref(db, 'users/DotMaster'), {
+                    id: 1, username: "DotMaster", password: "113371",
+                    dots: 999999, score: 9999, joinDate: new Date().toLocaleDateString(),
+                    gender: "male", avatar: "👑", roomColor: "gold"
+                });
+                set(ref(db, 'meta/userCount'), 1);
+            }
+        });
     </script>
 </body>
 </html>
