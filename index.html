@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dotverse</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #ffffff;
+            margin: 0;
+            padding: 0;
+            color: #000;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        .top-bar {
+            background-color: #f0f2f5;
+            padding: 10px;
+            display: flex;
+            justify-content: space-around;
+            border-bottom: 1px solid #ccc;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            z-index: 100;
+        }
+        .top-bar button {
+            background: none;
+            border: none;
+            font-size: 14px;
+            cursor: pointer;
+            color: #333;
+            font-weight: bold;
+        }
+        .top-bar button:hover { color: #0056b3; }
+        
+        #chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        #room-title {
+            text-align: center;
+            padding: 10px;
+            background: #e0e0e0;
+            font-weight: bold;
+        }
+        #messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+            background: #fff;
+        }
+        .message {
+            margin-bottom: 10px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .message-avatar { font-size: 20px; }
+        .message-user { font-weight: bold; margin-left: 5px; }
+        .message-text { margin-left: 5px; }
+        
+        #input-area {
+            display: flex;
+            padding: 10px;
+            border-top: 1px solid #ccc;
+            background: #f9f9f9;
+        }
+        #message-input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-family: inherit;
+        }
+        #send-btn {
+            padding: 10px 15px;
+            background: #0056b3;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            margin-left: 10px;
+            cursor: pointer;
+        }
+        
+        .screen {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: #fff;
+            z-index: 200;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        .screen.active { display: block; }
+        .close-btn {
+            background: #ff4444;
+            color: white;
+            border: none;
+            padding: 10px;
+            width: 100%;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            cursor: pointer;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        .btn {
+            width: 100%;
+            padding: 12px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        .btn-secondary { background: #007bff; }
+        .btn-danger { background: #dc3545; }
+        
+        /* User Rank Colors */
+        .c-blue-light { color: #87CEEB; }
+        .c-pink-light { color: #FFB6C1; }
+        .c-blue-dark { color: #0000AA; }
+        .c-red-dark { color: #CC0000; }
+        .c-purple-light { color: #9370DB; }
+        .c-purple-dark { color: #4B0082; }
+        .c-gray-dark { color: #333333; }
+        .c-yellow { color: #DAA520; }
+        .c-admin { color: #FFD700; font-weight: bold; text-shadow: 0 0 3px #000; }
+        
+        .crown::before { content: "👑 "; }
+    </style>
+</head>
+<body>
+
+    <!-- Auth Screen -->
+    <div id="auth-screen" class="screen active">
+        <h2>Welcome to Dotverse</h2>
+        <input type="text" id="username-input" placeholder="Username">
+        <input type="password" id="password-input" placeholder="Password">
+        <button class="btn" onclick="login()">Login</button>
+        <button class="btn btn-secondary" onclick="register()">Register</button>
+    </div>
+
+    <!-- Main App -->
+    <div id="main-app" style="display:none; flex-direction:column; height:100vh;">
+        <div class="top-bar">
+            <button onclick="openScreen('profile-screen')">👤 Profile</button>
+            <button onclick="openScreen('rooms-screen')">💬 Rooms</button>
+            <button onclick="openScreen('dots-screen')">💰 Dots</button>
+            <button onclick="openScreen('game-screen')">🎮 Games</button>
+            <button id="admin-btn" onclick="openScreen('admin-screen')" style="display:none;">👑 Admin</button>
+        </div>
+
+        <div id="chat-container">
+            <div id="room-title">Lobby</div>
+            <div id="messages"></div>
+            <div id="input-area">
+                <input type="text" id="message-input" placeholder="Type your message...">
+                <button id="send-btn" onclick="sendMessage()">Send</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Screen -->
+    <div id="profile-screen" class="screen">
+        <button class="close-btn" onclick="closeScreens()">Close</button>
+        <h3>My Profile</h3>
+        <p>ID: <span id="p-id"></span></p>
+        <p>Score: <span id="p-score"></span></p>
+        <p>Join Date: <span id="p-date"></span></p>
+        <input type="text" id="p-username" placeholder="New Username">
+        <button class="btn" onclick="updateProfile()">Save Changes</button>
+    </div>
+
+    <!-- Rooms Screen -->
+    <div id="rooms-screen" class="screen">
+        <button class="close-btn" onclick="closeScreens()">Close</button>
+        <h3>Rooms List</h3>
+        <div id="rooms-list"></div>
+        <h3>Create New Room (5 Dots)</h3>
+        <input type="text" id="new-room-name" placeholder="Room Name">
+        <button class="btn" onclick="createRoom()">Create Room</button>
+    </div>
+
+    <!-- Dots Screen -->
+    <div id="dots-screen" class="screen">
+        <button class="close-btn" onclick="closeScreens()">Close</button>
+        <h3>Dot Balance</h3>
+        <p>Your Balance: <span id="d-balance">0</span> Dots</p>
+        <h3>Transfer Dots</h3>
+        <input type="number" id="send-dots-id" placeholder="Recipient ID">
+        <input type="number" id="send-dots-amount" placeholder="Amount of Dots">
+        <button class="btn" onclick="sendDots()">Send</button>
+        <h3>Last 5 Transactions</h3>
+        <div id="transactions-list"></div>
+    </div>
+
+    <!-- Game Screen -->
+    <div id="game-screen" class="screen">
+        <button class="close-btn" onclick="closeScreens()">Close</button>
+        <h3>Roulette Game</h3>
+        <p>Balance: <span id="g-balance">0</span> Dots</p>
+        <input type="number" id="bet-amount" placeholder="Bet amount (1 to 100)">
+        <select id="bet-type">
+            <option value="even">Even (2x)</option>
+            <option value="odd">Odd (2x)</option>
+            <option value="dozen1">1st Dozen (3x)</option>
+            <option value="dozen2">2nd Dozen (3x)</option>
+            <option value="dozen3">3rd Dozen (3x)</option>
+            <option value="number">Specific Number (36x)</option>
+        </select>
+        <input type="number" id="bet-number" placeholder="Number (0 to 36)" style="display:none;">
+        <button class="btn" onclick="playRoulette()">Spin!</button>
+        <div id="roulette-result" style="margin-top:20px; font-weight:bold; text-align:center;"></div>
+    </div>
+
+    <!-- Admin Screen -->
+    <div id="admin-screen" class="screen">
+        <button class="close-btn" onclick="closeScreens()">Close</button>
+        <h3>DotMaster Admin Panel 👑</h3>
+        <p>This section is only visible to User 1.</p>
+    </div>
+
+    <script>
+        // Firebase and App logic will go here in the next step
+    </script>
+</body>
+</html>
