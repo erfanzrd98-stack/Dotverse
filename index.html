@@ -6,16 +6,16 @@
     <title>Dotverse</title>
     <style>
         body { font-family: Arial, sans-serif; background-color: #ffffff; margin: 0; padding: 0; color: #000; display: flex; flex-direction: column; height: 100vh; }
-        .top-bar { background-color: #f0f2f5; padding: 10px; display: flex; justify-content: space-around; border-bottom: 1px solid #ccc; box-shadow: 0 2px 5px rgba(0,0,0,0.1); z-index: 100; }
+        .top-bar { background-color: #f0f2f5; padding: 10px; display: flex; justify-content: space-around; border-bottom: 1px solid #ccc; z-index: 100; }
         .top-bar button { background: none; border: none; font-size: 14px; cursor: pointer; color: #333; font-weight: bold; }
-        .top-bar button:hover { color: #0056b3; }
         #chat-container { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
         #room-title { text-align: center; padding: 10px; background: #e0e0e0; font-weight: bold; }
         #messages { flex: 1; overflow-y: auto; padding: 10px; background: #fff; }
         .message { margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 5px; display: flex; align-items: center; gap: 5px; }
         .message-avatar { font-size: 20px; }
-        .message-user { font-weight: bold; margin-left: 5px; }
+        .message-user { font-weight: bold; margin-left: 5px; cursor: pointer; text-decoration: underline; }
         .message-text { margin-left: 5px; }
+        .system-message { text-align: center; color: #888; font-size: 12px; font-style: italic; margin: 10px 0; }
         #input-area { display: flex; padding: 10px; border-top: 1px solid #ccc; background: #f9f9f9; }
         #message-input { flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-family: inherit; }
         #send-btn { padding: 10px 15px; background: #0056b3; color: white; border: none; border-radius: 5px; margin-left: 10px; cursor: pointer; }
@@ -26,10 +26,27 @@
         .btn { width: 100%; padding: 12px; background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; margin-bottom: 10px; }
         .btn-secondary { background: #007bff; }
         .btn-danger { background: #dc3545; }
+        
+        /* Colors */
+        .c-black { color: #000; } .c-red { color: #FF0000; } .c-green { color: #008000; } .c-blue { color: #0000FF; } 
         .c-blue-light { color: #87CEEB; } .c-pink-light { color: #FFB6C1; } .c-blue-dark { color: #0000AA; } .c-red-dark { color: #CC0000; }
         .c-purple-light { color: #9370DB; } .c-purple-dark { color: #4B0082; } .c-gray-dark { color: #333333; } .c-yellow { color: #DAA520; }
         .c-admin { color: #FFD700; font-weight: bold; text-shadow: 0 0 3px #000; }
-        .crown::before { content: "👑 "; }
+        
+        /* Context Menu */
+        #context-menu { display: none; position: fixed; background: #fff; border: 1px solid #ccc; box-shadow: 0 2px 10px rgba(0,0,0,0.2); padding: 10px; z-index: 300; border-radius: 8px; width: 200px; }
+        #context-menu button { display: block; width: 100%; padding: 10px; margin-bottom: 5px; border: none; background: #f0f2f5; text-align: left; cursor: pointer; border-radius: 5px; }
+        #context-menu button:hover { background: #e0e0e0; }
+        
+        /* PM Popup */
+        #pm-popup { display: none; position: fixed; bottom: 0; right: 0; width: 300px; height: 400px; background: #fff; border: 1px solid #ccc; box-shadow: 0 0 10px rgba(0,0,0,0.2); z-index: 400; display: flex; flex-direction: column; }
+        #pm-header { background: #0056b3; color: #fff; padding: 10px; display: flex; justify-content: space-between; }
+        #pm-messages { flex: 1; overflow-y: auto; padding: 10px; }
+        #pm-input-area { display: flex; padding: 10px; border-top: 1px solid #ccc; }
+        #pm-input { flex: 1; border: 1px solid #ccc; padding: 5px; }
+        .pm-msg { margin-bottom: 5px; }
+        .pm-msg.sent { text-align: right; color: #0056b3; }
+        .pm-msg.received { text-align: left; color: #333; }
     </style>
 </head>
 <body>
@@ -46,18 +63,20 @@
     <!-- Main App -->
     <div id="main-app" style="display:none; flex-direction:column; height:100vh;">
         <div class="top-bar">
-            <button onclick="openScreen('profile-screen')">👤 Profile</button>
+            <button onclick="openScreen('profile-screen')">👤</button>
             <button onclick="openScreen('rooms-screen')">💬 Rooms</button>
+            <button onclick="openScreen('friends-screen')">👥 Friends</button>
             <button onclick="openScreen('dots-screen')">💰 Dots</button>
-            <button onclick="openScreen('game-screen')">🎮 Games</button>
-            <button id="admin-btn" onclick="openScreen('admin-screen')" style="display:none;">👑 Admin</button>
+            <button onclick="openScreen('game-screen')">🎮 Game</button>
+            <button onclick="openScreen('room-info-screen')">ℹ️</button>
+            <button id="admin-btn" onclick="openScreen('admin-screen')" style="display:none;">👑</button>
         </div>
 
         <div id="chat-container">
             <div id="room-title">Lobby</div>
             <div id="messages"></div>
             <div id="input-area">
-                <input type="text" id="message-input" placeholder="Type your message...">
+                <input type="text" id="message-input" placeholder="Type a message...">
                 <button id="send-btn" onclick="sendMessage()">Send</button>
             </div>
         </div>
@@ -70,8 +89,25 @@
         <p>ID: <span id="p-id"></span></p>
         <p>Score: <span id="p-score"></span></p>
         <p>Join Date: <span id="p-date"></span></p>
-        <input type="text" id="p-username" placeholder="New Username">
+        
+        <label>Avatar:</label>
+        <select id="p-avatar">
+            <option value="👤">👤</option><option value="🦋">🦋</option><option value="🎀">🎀</option><option value="🎃">🎃</option><option value="⚽">⚽</option><option value="🏀">🏀</option><option value="🎱">🎱</option><option value="🎩">🎩</option><option value="🪬">🪬</option><option value="🔴">🔴</option><option value="🟠">🟠</option><option value="🟡">🟡</option><option value="🟢">🟢</option><option value="🔵">🔵</option><option value="🟣">🟣</option><option value="🟤">🟤</option><option value="⚫">⚫</option><option value="♣️">♣️</option><option value="♠️">♠️</option><option value="♥️">♥️</option><option value="♦️">♦️</option><option value="🌼">🌼</option><option value="🍄">🍄</option><option value="🌵">🌵</option><option value="🌴">🌴</option><option value="🐭">🐭</option><option value="🐰">🐰</option><option value="🦊">🦊</option><option value="🦄">🦄</option>
+        </select>
+        
+        <label>Gender:</label>
+        <select id="p-gender"><option value="male">Male</option><option value="female">Female</option></select>
+        
+        <label>Chat Room Name Color (2 Dots):</label>
+        <select id="p-room-color">
+            <option value="c-black">Black (Default)</option>
+            <option value="c-red">Red</option>
+            <option value="c-green">Green</option>
+            <option value="c-blue">Blue</option>
+        </select>
+
         <button class="btn" onclick="updateProfile()">Save Changes</button>
+        <button class="btn btn-danger" onclick="logout()">Logout</button>
     </div>
 
     <!-- Rooms Screen -->
@@ -84,17 +120,32 @@
         <button class="btn" onclick="createRoom()">Create Room</button>
     </div>
 
+    <!-- Friends Screen -->
+    <div id="friends-screen" class="screen">
+        <button class="close-btn" onclick="closeScreens()">Close</button>
+        <h3>My Friends</h3>
+        <div id="friends-list"></div>
+    </div>
+
+    <!-- Room Info Screen -->
+    <div id="room-info-screen" class="screen">
+        <button class="close-btn" onclick="closeScreens()">Close</button>
+        <h3>Room Information</h3>
+        <p>Name: <span id="ri-name"></span></p>
+        <p>ID: <span id="ri-id"></span></p>
+        <p>Creator: <span id="ri-creator"></span></p>
+        <p>Owner: <span id="ri-owner"></span></p>
+    </div>
+
     <!-- Dots Screen -->
     <div id="dots-screen" class="screen">
         <button class="close-btn" onclick="closeScreens()">Close</button>
         <h3>Dot Balance</h3>
         <p>Your Balance: <span id="d-balance">0</span> Dots</p>
         <h3>Transfer Dots</h3>
-        <input type="number" id="send-dots-id" placeholder="Recipient ID">
-        <input type="number" id="send-dots-amount" placeholder="Amount of Dots">
+        <input type="text" id="send-dots-id" placeholder="Recipient Username">
+        <input type="number" id="send-dots-amount" placeholder="Amount">
         <button class="btn" onclick="sendDots()">Send</button>
-        <h3>Last 5 Transactions</h3>
-        <div id="transactions-list"></div>
     </div>
 
     <!-- Game Screen -->
@@ -102,16 +153,13 @@
         <button class="close-btn" onclick="closeScreens()">Close</button>
         <h3>Roulette Game</h3>
         <p>Balance: <span id="g-balance">0</span> Dots</p>
-        <input type="number" id="bet-amount" placeholder="Bet amount (1 to 100)">
-        <select id="bet-type">
-            <option value="even">Even (2x)</option>
-            <option value="odd">Odd (2x)</option>
-            <option value="dozen1">1st Dozen (3x)</option>
-            <option value="dozen2">2nd Dozen (3x)</option>
-            <option value="dozen3">3rd Dozen (3x)</option>
+        <input type="number" id="bet-amount" placeholder="Bet (1 to 100)">
+        <select id="bet-type" onchange="toggleBetNumber()">
+            <option value="even">Even (2x)</option><option value="odd">Odd (2x)</option>
+            <option value="dozen1">1st Dozen (3x)</option><option value="dozen2">2nd Dozen (3x)</option><option value="dozen3">3rd Dozen (3x)</option>
             <option value="number">Specific Number (36x)</option>
         </select>
-        <input type="number" id="bet-number" placeholder="Number (0 to 36)" style="display:none;">
+        <input type="number" id="bet-number" placeholder="Number (0-36)" style="display:none;">
         <button class="btn" onclick="playRoulette()">Spin!</button>
         <div id="roulette-result" style="margin-top:20px; font-weight:bold; text-align:center;"></div>
     </div>
@@ -120,32 +168,68 @@
     <div id="admin-screen" class="screen">
         <button class="close-btn" onclick="closeScreens()">Close</button>
         <h3>DotMaster Admin Panel 👑</h3>
-        <p>This section is only visible to User 1.</p>
+        <button class="btn btn-secondary" onclick="adminAddDots()">Give Dots to User</button>
+        <button class="btn btn-secondary" onclick="alert('Feature ready!')">View All Users</button>
     </div>
 
-    <!-- Firebase & App Logic -->
+    <!-- Context Menu (Popup on user click) -->
+    <div id="context-menu">
+        <button onclick="ctxAction('pm')">Message (PM)</button>
+        <button onclick="ctxAction('profile')">View Profile</button>
+        <button onclick="ctxAction('friend')">Add to Friends</button>
+        <button onclick="ctxAction('dots')">Send Dots</button>
+        <button onclick="ctxAction('close')" style="color:red;">Close</button>
+    </div>
+
+    <!-- PM Popup -->
+    <div id="pm-popup" style="display:none;">
+        <div id="pm-header">
+            <span id="pm-username"></span>
+            <button onclick="closePM()" style="background:none; color:#fff; border:none; font-size:20px; cursor:pointer;">×</button>
+        </div>
+        <div id="pm-messages"></div>
+        <div id="pm-input-area">
+            <input type="text" id="pm-input" placeholder="Type PM...">
+            <button onclick="sendPM()" style="padding:10px; background:#0056b3; color:#fff; border:none;">Send</button>
+        </div>
+    </div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getDatabase, ref, set, get, child, onValue, push, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
         const firebaseConfig = {
-          apiKey: "AIzaSyDTd3EWgEh6ytP0a_GbWpAvmzpz8z6tPdY",
-          authDomain: "dotverse-12907.firebaseapp.com",
-          databaseURL: "https://dotverse-12907-default-rtdb.firebaseio.com",
-          projectId: "dotverse-12907",
-          storageBucket: "dotverse-12907.firebasestorage.app",
-          messagingSenderId: "342977939027",
-          appId: "1:342977939027:web:8e354d66f5c306ffb428a6",
-          measurementId: "G-CFWWLLTSJR"
+          apiKey: "AIzaSyDTd3EWgEh6ytP0a_GbWpAvmzpz8z6tPdY", authDomain: "dotverse-12907.firebaseapp.com",
+          databaseURL: "https://dotverse-12907-default-rtdb.firebaseio.com", projectId: "dotverse-12907",
+          storageBucket: "dotverse-12907.firebasestorage.app", messagingSenderId: "342977939027",
+          appId: "1:342977939027:web:8e354d66f5c306ffb428a6", measurementId: "G-CFWWLLTSJR"
         };
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
-        
         let currentUser = null;
         let currentRoom = "Lobby";
+        let contextUser = null;
+        let pmUser = null;
+
+        function getUserColorPublic(user) {
+            if(user.username === 'DotMaster') return 'c-admin';
+            if(user.roomColor) return user.roomColor; // Bought color in public rooms
+            return 'c-black';
+        }
         
-        // Make functions global
+        function getUserColorPM(user) {
+            if(user.username === 'DotMaster') return 'c-admin';
+            let score = user.score || 0;
+            let gender = user.gender || 'male';
+            if(score <= 100) return gender === 'male' ? 'c-blue-light' : 'c-pink-light';
+            if(score <= 200) return gender === 'male' ? 'c-blue-dark' : 'c-red-dark';
+            if(score <= 1000) return 'c-purple-light';
+            if(score <= 1500) return 'c-purple-dark';
+            if(score <= 2000) return 'c-gray-dark';
+            return 'c-yellow';
+        }
+
         window.openScreen = function(id) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById(id).classList.add('active');
@@ -153,121 +237,346 @@
                 document.getElementById('d-balance').innerText = currentUser.dots;
                 document.getElementById('g-balance').innerText = currentUser.dots;
             }
+            if(id === 'rooms-screen') loadRooms();
+            if(id === 'room-info-screen') loadRoomInfo();
+            if(id === 'friends-screen') loadFriends();
         };
-        window.closeScreens = function() {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-        };
+        window.closeScreens = function() { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); };
+        window.toggleBetNumber = function() { document.getElementById('bet-number').style.display = document.getElementById('bet-type').value === 'number' ? 'block' : 'none'; };
 
-        // Auth Functions
         window.login = function() {
-            const username = document.getElementById('username-input').value.trim();
-            const password = document.getElementById('password-input').value;
-            if(!username || !password) return alert("Enter username and password");
-            
-            get(ref(db, 'users/' + username)).then((snapshot) => {
-                if (snapshot.exists()) {
-                    if(snapshot.val().password === password) {
-                        currentUser = snapshot.val();
-                        startApp();
-                    } else { alert("Wrong password!"); }
-                } else { alert("User not found. Please register."); }
+            const u = document.getElementById('username-input').value.trim();
+            const p = document.getElementById('password-input').value;
+            if(!u || !p) return alert("Enter info");
+            get(ref(db, 'users/' + u)).then((s) => {
+                if (s.exists()) {
+                    if(s.val().password === p) { currentUser = s.val(); startApp(); } 
+                    else { alert("Wrong password!"); }
+                } else { alert("User not found."); }
             });
         };
 
         window.register = function() {
-            const username = document.getElementById('username-input').value.trim();
-            const password = document.getElementById('password-input').value;
-            if(!username || !password) return alert("Enter username and password");
-            
-            get(ref(db, 'users/' + username)).then((snapshot) => {
-                if (snapshot.exists()) {
-                    alert("Username already exists!");
-                } else {
-                    get(ref(db, 'meta/userCount')).then(cSnap => {
-                        let count = cSnap.exists() ? cSnap.val() : 1;
-                        if(count >= 10) return alert("Capacity reached (10 users).");
-                        
-                        const newId = count + 1;
-                        const newUserData = {
-                            id: newId, username: username, password: password,
-                            dots: 10, score: 0, joinDate: new Date().toLocaleDateString(),
-                            gender: "male", avatar: "⚽", roomColor: "black"
-                        };
-                        
-                        set(ref(db, 'users/' + username), newUserData).then(() => {
-                            set(ref(db, 'meta/userCount'), newId);
-                            currentUser = newUserData;
-                            startApp();
-                        });
+            const u = document.getElementById('username-input').value.trim();
+            const p = document.getElementById('password-input').value;
+            if(!u || !p) return alert("Enter info");
+            get(ref(db, 'users/' + u)).then((s) => {
+                if (s.exists()) return alert("Username exists!");
+                get(ref(db, 'meta/userCount')).then(c => {
+                    let count = c.exists() ? c.val() : 1;
+                    if(count >= 10) return alert("Capacity full (10).");
+                    let newId = count + 1;
+                    let data = { id: newId, username: u, password: p, dots: 10, score: 0, joinDate: new Date().toLocaleDateString(), gender: "male", avatar: "👤", roomColor: "c-black", friends: {} };
+                    set(ref(db, 'users/' + u), data).then(() => {
+                        set(ref(db, 'meta/userCount'), newId);
+                        currentUser = data; startApp();
                     });
-                }
+                });
             });
+        };
+
+        window.logout = function() {
+            currentUser = null;
+            currentRoom = "Lobby";
+            document.getElementById('main-app').style.display = 'none';
+            document.getElementById('auth-screen').classList.add('active');
+            document.getElementById('username-input').value = '';
+            document.getElementById('password-input').value = '';
         };
 
         function startApp() {
             document.getElementById('auth-screen').classList.remove('active');
             document.getElementById('main-app').style.display = 'flex';
-            
-            if(currentUser.id === 1) {
-                document.getElementById('admin-btn').style.display = 'block';
-            }
-            
+            if(currentUser.username === 'DotMaster') document.getElementById('admin-btn').style.display = 'block';
             document.getElementById('p-id').innerText = currentUser.id;
             document.getElementById('p-score').innerText = currentUser.score;
             document.getElementById('p-date').innerText = currentUser.joinDate;
-            document.getElementById('p-username').value = currentUser.username;
-            
-            loadMessages();
+            document.getElementById('p-avatar').value = currentUser.avatar;
+            document.getElementById('p-gender').value = currentUser.gender;
+            if(currentUser.roomColor) document.getElementById('p-room-color').value = currentUser.roomColor;
+            switchRoom("Lobby", true);
         }
 
-        // Chat Functions
+        function sendSystemMessage(room, text) {
+            push(ref(db, 'rooms/' + room + '/messages'), { type: 'system', text: text, timestamp: Date.now() });
+        }
+
+        window.switchRoom = function(name, isInitial = false) {
+            if(currentRoom === name && !isInitial) return closeScreens();
+            if(name === "VIP" && currentUser.username !== 'DotMaster') {
+                let validUntil = currentUser.vipExpiry || 0;
+                if(Date.now() > validUntil) {
+                    if(currentUser.dots < 1) return alert("You need 1 Dot to enter VIP!");
+                    currentUser.dots -= 1;
+                    currentUser.vipExpiry = Date.now() + (24 * 60 * 60 * 1000);
+                    update(ref(db, 'users/' + currentUser.username), { dots: currentUser.dots, vipExpiry: currentUser.vipExpiry });
+                }
+            }
+            if(!isInitial) sendSystemMessage(currentRoom, `${currentUser.username} left the room.`);
+            currentRoom = name;
+            document.getElementById('room-title').innerText = name;
+            sendSystemMessage(currentRoom, `${currentUser.username} entered the room.`);
+            closeScreens();
+            loadMessages();
+        };
+
         function loadMessages() {
             const msgRef = ref(db, 'rooms/' + currentRoom + '/messages');
             onValue(msgRef, (snapshot) => {
                 const messagesDiv = document.getElementById('messages');
                 messagesDiv.innerHTML = '';
-                snapshot.forEach((childSnapshot) => {
-                    const msg = childSnapshot.val();
-                    const div = document.createElement('div');
-                    div.className = 'message';
-                    div.innerHTML = `<span class="message-avatar">${msg.avatar || '👤'}</span> <span class="message-user">${msg.username}</span>: <span class="message-text">${msg.text}</span>`;
-                    messagesDiv.appendChild(div);
+                get(ref(db, 'users')).then(userSnap => {
+                    let allUsers = userSnap.val() || {};
+                    snapshot.forEach((cs) => {
+                        const msg = cs.val();
+                        // Auto delete messages older than 24h
+                        if(Date.now() - msg.timestamp > 24*60*60*1000) return;
+                        
+                        const div = document.createElement('div');
+                        if(msg.type === 'system') {
+                            div.className = 'system-message';
+                            div.innerText = msg.text;
+                        } else {
+                            const ud = allUsers[msg.username] || {score:0, avatar:'👤', gender:'male', roomColor:'c-black'};
+                            div.className = 'message';
+                            div.innerHTML = `<span class="message-avatar">${ud.avatar}</span> <span class="message-user ${getUserColorPublic(ud)}" onclick="showContextMenu('${msg.username}', event)">${msg.username}</span>: <span class="message-text">${msg.text}</span>`;
+                        }
+                        messagesDiv.appendChild(div);
+                    });
+                    messagesDiv.scrollTop = messagesDiv.scrollHeight;
                 });
-                messagesDiv.scrollTop = messagesDiv.scrollHeight;
             });
         }
+
+        window.showContextMenu = function(username, event) {
+            contextUser = username;
+            const menu = document.getElementById('context-menu');
+            menu.style.display = 'block';
+            menu.style.left = event.clientX + 'px';
+            menu.style.top = event.clientY + 'px';
+        };
+        
+        window.onclick = function() {
+            document.getElementById('context-menu').style.display = 'none';
+        };
+
+        window.ctxAction = function(action) {
+            if(!contextUser) return;
+            if(action === 'pm') openPM(contextUser);
+            if(action === 'profile') alert("Profile page for " + contextUser);
+            if(action === 'friend') addFriend(contextUser);
+            if(action === 'dots') {
+                let amt = prompt(`Send dots to ${contextUser}:`);
+                if(amt) transferDots(contextUser, parseInt(amt));
+            }
+            contextUser = null;
+            document.getElementById('context-menu').style.display = 'none';
+        };
 
         window.sendMessage = function() {
             const input = document.getElementById('message-input');
             const text = input.value.trim();
             if(!text) return;
-            
-            push(ref(db, 'rooms/' + currentRoom + '/messages'), {
-                username: currentUser.username,
-                avatar: currentUser.avatar,
-                text: text,
-                timestamp: Date.now()
-            });
+            push(ref(db, 'rooms/' + currentRoom + '/messages'), { username: currentUser.username, text: text, timestamp: Date.now() });
+            currentUser.score = (currentUser.score || 0) + 1;
+            let updates = {score: currentUser.score};
+            if(currentUser.score > 0 && currentUser.score % 100 === 0) {
+                currentUser.dots += 10; updates.dots = currentUser.dots;
+                alert("Congrats! +10 Dots.");
+            }
+            update(ref(db, 'users/' + currentUser.username), updates);
+            document.getElementById('p-score').innerText = currentUser.score;
             input.value = '';
         }
 
-        // Dummy functions for now
-        window.updateProfile = function() { alert("Profile update function coming next!"); }
-        window.createRoom = function() { alert("Room creation function coming next!"); }
-        window.sendDots = function() { alert("Send dots function coming next!"); }
-        window.playRoulette = function() { alert("Roulette function coming next!"); }
-
-        // Create DotMaster automatically if not exists
-        get(ref(db, 'users/DotMaster')).then(snap => {
-            if(!snap.exists()) {
-                set(ref(db, 'users/DotMaster'), {
-                    id: 1, username: "DotMaster", password: "113371",
-                    dots: 999999, score: 9999, joinDate: new Date().toLocaleDateString(),
-                    gender: "male", avatar: "👑", roomColor: "gold"
+        // PM System
+        function openPM(username) {
+            pmUser = username;
+            document.getElementById('pm-username').innerText = username;
+            document.getElementById('pm-popup').style.display = 'flex';
+            loadPMMessages(username);
+        }
+        window.closePM = function() { document.getElementById('pm-popup').style.display = 'none'; pmUser = null; };
+        
+        function loadPMMessages(username) {
+            const pmId = [currentUser.username, username].sort().join('_');
+            const pmRef = ref(db, 'pms/' + pmId);
+            onValue(pmRef, (snap) => {
+                const div = document.getElementById('pm-messages');
+                div.innerHTML = '';
+                get(ref(db, 'users/' + username)).then(u => {
+                    let ud = u.val() || {};
+                    snap.forEach(c => {
+                        let msg = c.val();
+                        let mDiv = document.createElement('div');
+                        mDiv.className = 'pm-msg ' + (msg.sender === currentUser.username ? 'sent' : 'received');
+                        mDiv.style.color = msg.sender === currentUser.username ? '#0056b3' : getUserColorPM(ud);
+                        mDiv.innerText = msg.text;
+                        div.appendChild(mDiv);
+                    });
+                    div.scrollTop = div.scrollHeight;
                 });
+            });
+        }
+        
+        window.sendPM = function() {
+            const input = document.getElementById('pm-input');
+            const text = input.value.trim();
+            if(!text || !pmUser) return;
+            const pmId = [currentUser.username, pmUser].sort().join('_');
+            push(ref(db, 'pms/' + pmId), { sender: currentUser.username, text: text, timestamp: Date.now() });
+            input.value = '';
+        }
+
+        // Friends
+        window.addFriend = function(username) {
+            if(!currentUser.friends) currentUser.friends = {};
+            currentUser.friends[username] = true;
+            update(ref(db, 'users/' + currentUser.username), { friends: currentUser.friends });
+            alert(username + " added to friends!");
+        };
+        function loadFriends() {
+            const list = document.getElementById('friends-list');
+            list.innerHTML = '';
+            if(currentUser.friends) {
+                Object.keys(currentUser.friends).forEach(f => {
+                    let btn = document.createElement('button');
+                    btn.className = 'btn btn-secondary';
+                    btn.innerText = f;
+                    btn.onclick = () => openPM(f);
+                    list.appendChild(btn);
+                });
+            }
+        }
+
+        // Other Functions
+        function loadRooms() {
+            get(ref(db, 'rooms')).then(snap => {
+                const list = document.getElementById('rooms-list');
+                list.innerHTML = '';
+                if(snap.exists()) {
+                    Object.keys(snap.val()).forEach(name => {
+                        let btn = document.createElement('button');
+                        btn.className = 'btn btn-secondary';
+                        btn.innerText = name;
+                        btn.onclick = () => switchRoom(name);
+                        list.appendChild(btn);
+                    });
+                }
+            });
+        }
+
+        function loadRoomInfo() {
+            get(ref(db, 'rooms/' + currentRoom + '/info')).then(snap => {
+                if(snap.exists()) {
+                    const info = snap.val();
+                    document.getElementById('ri-name').innerText = info.name;
+                    document.getElementById('ri-id').innerText = info.id || 'N/A';
+                    document.getElementById('ri-creator').innerText = info.creator;
+                    document.getElementById('ri-owner').innerText = info.owner;
+                }
+            });
+        }
+
+        window.createRoom = function() {
+            const name = document.getElementById('new-room-name').value.trim();
+            if(!name) return alert("Enter name");
+            if(currentUser.dots < 5) return alert("Need 5 dots!");
+            get(ref(db, 'meta/roomCount')).then(c => {
+                let count = c.exists() ? c.val() : 2;
+                let newId = count + 1;
+                currentUser.dots -= 5;
+                set(ref(db, 'rooms/' + name + '/info'), { name: name, owner: currentUser.username, creator: currentUser.username, id: newId });
+                update(ref(db, 'users/' + currentUser.username), { dots: currentUser.dots });
+                set(ref(db, 'meta/roomCount'), newId);
+                alert("Room created!"); document.getElementById('new-room-name').value = '';
+            });
+        }
+
+        window.updateProfile = function() {
+            currentUser.avatar = document.getElementById('p-avatar').value;
+            currentUser.gender = document.getElementById('p-gender').value;
+            let newColor = document.getElementById('p-room-color').value;
+            
+            if(newColor !== currentUser.roomColor) {
+                if(currentUser.dots < 2) return alert("Need 2 dots to change color!");
+                currentUser.dots -= 2;
+                currentUser.roomColor = newColor;
+            }
+            update(ref(db, 'users/' + currentUser.username), { avatar: currentUser.avatar, gender: currentUser.gender, roomColor: currentUser.roomColor, dots: currentUser.dots });
+            alert("Saved!"); closeScreens();
+        }
+
+        window.sendDots = function() {
+            const r = document.getElementById('send-dots-id').value.trim();
+            const a = parseInt(document.getElementById('send-dots-amount').value);
+            transferDots(r, a);
+        };
+        
+        function transferDots(recipient, amount) {
+            if(!recipient || !amount || amount <= 0) return alert("Invalid");
+            if(currentUser.dots < amount) return alert("Not enough dots");
+            get(ref(db, 'users/' + recipient)).then(s => {
+                if(!s.exists()) return alert("User not found");
+                let rd = s.val(); rd.dots = (rd.dots || 0) + amount;
+                currentUser.dots -= amount;
+                update(ref(db, 'users/' + recipient), { dots: rd.dots });
+                update(ref(db, 'users/' + currentUser.username), { dots: currentUser.dots });
+                document.getElementById('d-balance').innerText = currentUser.dots;
+                alert("Sent!");
+            });
+        }
+
+        window.playRoulette = function() {
+            const bet = parseInt(document.getElementById('bet-amount').value);
+            const type = document.getElementById('bet-type').value;
+            const num = parseInt(document.getElementById('bet-number').value);
+            if(!bet || bet < 1 || bet > 100) return alert("Bet 1-100");
+            if(currentUser.dots < bet) return alert("Not enough dots");
+            if(type === 'number' && (isNaN(num) || num < 0 || num > 36)) return alert("Num 0-36");
+            
+            const res = Math.floor(Math.random() * 37);
+            let win = 0; let txt = `Number: ${res}. `;
+            if(type === 'number' && res === num) { win = bet * 36; txt += "Won 36x! 🎉"; }
+            else if(type === 'even' && res !== 0 && res % 2 === 0) { win = bet * 2; txt += "Even! Won 2x! 🎉"; }
+            else if(type === 'odd' && res % 2 === 1) { win = bet * 2; txt += "Odd! Won 2x! 🎉"; }
+            else if(type === 'dozen1' && res >= 1 && res <= 12) { win = bet * 3; txt += "1st Dozen! Won 3x! 🎉"; }
+            else if(type === 'dozen2' && res >= 13 && res <= 24) { win = bet * 3; txt += "2nd Dozen! Won 3x! 🎉"; }
+            else if(type === 'dozen3' && res >= 25 && res <= 36) { win = bet * 3; txt += "3rd Dozen! Won 3x! 🎉"; }
+            else { txt += "Lost! 😢"; }
+            
+            currentUser.dots = currentUser.dots - bet + win;
+            update(ref(db, 'users/' + currentUser.username), { dots: currentUser.dots });
+            document.getElementById('g-balance').innerText = currentUser.dots;
+            document.getElementById('roulette-result').innerText = txt;
+        }
+
+        window.adminAddDots = function() {
+            const u = prompt("Enter username:");
+            if(!u) return;
+            const a = parseInt(prompt("Amount:"));
+            if(!a) return;
+            get(ref(db, 'users/' + u)).then(s => {
+                if(!s.exists()) return alert("Not found");
+                let d = s.val(); d.dots = (d.dots || 0) + a;
+                update(ref(db, 'users/' + u), { dots: d.dots });
+                // Send PM from DotMaster
+                const pmId = ["DotMaster", u].sort().join('_');
+                push(ref(db, 'pms/' + pmId), { sender: "DotMaster", text: `You received ${a} Dots!`, timestamp: Date.now() });
+                alert("Done!");
+            });
+        }
+
+        // Init
+        get(ref(db, 'users/DotMaster')).then(s => {
+            if(!s.exists()) {
+                set(ref(db, 'users/DotMaster'), { id: 1, username: "DotMaster", password: "113371", dots: 999999, score: 9999, joinDate: new Date().toLocaleDateString(), gender: "male", avatar: "👑", roomColor: "c-admin" });
                 set(ref(db, 'meta/userCount'), 1);
             }
         });
+        get(ref(db, 'rooms/Lobby/info')).then(s => { if(!s.exists()) set(ref(db, 'rooms/Lobby/info'), { name: "Lobby", owner: "DotMaster", creator: "DotMaster", id: 1 }); });
+        get(ref(db, 'rooms/VIP/info')).then(s => { if(!s.exists()) set(ref(db, 'rooms/VIP/info'), { name: "VIP", owner: "DotMaster", creator: "DotMaster", id: 2 }); });
+        get(ref(db, 'meta/roomCount')).then(s => { if(!s.exists()) set(ref(db, 'meta/roomCount'), 2); });
     </script>
 </body>
 </html>
