@@ -2,14 +2,16 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 <title>Dotverse</title>
 <style>
   :root{ --bg:#fff; --ink:#14181f; --muted:#6b7280; --line:#e7e9ee; --dot:#3d5afe; --dot-soft:#eef0ff; --danger:#e14b4b; --gold:#c9971f; }
-  *{box-sizing:border-box;} html,body{height:100%;margin:0;font-family:'Segoe UI',sans-serif;background:var(--bg);color:var(--ink);}
+  *{box-sizing:border-box;} html,body{height:100%;margin:0;font-family:'Segoe UI',sans-serif;background:var(--bg);color:var(--ink);overflow:hidden;}
   .hidden{display:none!important;}
   ::-webkit-scrollbar{width:8px;} ::-webkit-scrollbar-thumb{background:var(--line);border-radius:8px;}
-  .auth-wrap{display:flex;align-items:center;justify-content:center;height:100%;padding:24px;}
+  
+  /* Auth */
+  .auth-wrap{display:flex;align-items:center;justify-content:center;height:100%;padding:24px;overflow-y:auto;}
   .auth-card{width:100%;max-width:380px;border:1px solid var(--line);border-radius:14px;padding:32px 28px;background:#fff;box-shadow:0 12px 32px -12px rgba(0,0,0,.1);}
   .brand{display:flex;align-items:center;gap:10px;margin-bottom:6px;}
   .brand-dot{width:14px;height:14px;border-radius:50%;background:var(--dot);box-shadow:0 0 0 4px var(--dot-soft);}
@@ -25,34 +27,43 @@
   .btn-sm{padding:7px 12px;font-size:12.5px;border-radius:8px;background:#f4f5f7;color:var(--ink);width:auto;margin:0;}
   .btn-danger{background:#ef4444;color:#fff;}
   .auth-msg{font-size:13px;margin-top:12px;min-height:16px;color:var(--danger);}
+
+  /* Shell & Scrolling Fix */
+  #app{height:100%; display:flex; flex-direction:column;}
   #shell{display:flex;flex-direction:column;height:100%;overflow:hidden;}
   #topbar-mobile{display:flex;justify-content:space-between;border-bottom:1px solid var(--line);background:#fff;flex-shrink:0;overflow-x:auto;}
   .topbar-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:9px 4px;cursor:pointer;color:var(--muted);min-width:52px;}
   .topbar-btn .tb-icon{font-size:18px;}
   .topbar-btn .tb-label{font-size:8.5px;font-weight:700;}
   .topbar-btn.hidden{display:none;}
-  #main{flex:1;display:flex;flex-direction:column;min-width:0;}
-  #room-header{display:flex;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--line);}
+  
+  #main{flex:1;display:flex;flex-direction:column;min-height:0;} /* min-height fix */
+  #room-header{display:flex;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--line);flex-shrink:0;}
   #room-header .rtitle{font-weight:700;font-size:15px;display:flex;align-items:center;gap:8px;}
   #room-header .rscore{font-size:12px;color:var(--muted);}
-  #messages{flex:1;overflow-y:auto;padding:18px 20px;display:flex;flex-direction:column;gap:12px;}
-  .msg{display:flex;gap:10px;align-items:flex-start;}
-  .avatar-emoji{font-size:20px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;background:var(--dot-soft);border-radius:50%;flex-shrink:0;cursor:pointer;}
+  
+  #messages{flex:1;overflow-y:auto;padding:18px 20px;display:flex;flex-direction:column;gap:12px;min-height:0;} /* Scrollable */
+  .msg{display:flex;gap:8px;align-items:flex-start;}
+  .avatar-emoji{font-size:16px;width:24px;height:24px;display:flex;align-items:center;justify-content:center;background:var(--dot-soft);border-radius:50%;flex-shrink:0;cursor:pointer;}
   .msg-body{display:flex;align-items:baseline;gap:6px;flex-wrap:wrap;}
   .msg-name{font-size:13px;font-weight:700;cursor:pointer;}
   .msg-text{font-size:14px;word-break:break-word;}
   .sys-msg{text-align:center;color:var(--muted);font-size:12px;font-style:italic;margin:5px 0;}
-  #composer{display:flex;gap:10px;padding:14px 20px;border-top:1px solid var(--line);}
+  
+  #composer{display:flex;gap:10px;padding:14px 20px;border-top:1px solid var(--line);flex-shrink:0;} /* Fixed bottom */
   #composer input{flex:1;}
   #composer button{padding:0 20px;margin:0;width:auto;}
-  .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;z-index:80;padding:20px;}
-  .modal-card{background:#fff;border-radius:16px;padding:26px;width:100%;max-width:380px;max-height:86vh;overflow-y:auto;}
-  .modal-card.wide{max-width:600px;}
+
+  /* Modals & Menus */
+  .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;z-index:80;padding:20px;overflow-y:auto;}
+  .modal-card{background:#fff;border-radius:16px;padding:26px;width:100%;max-width:380px;max-height:86vh;overflow-y:auto;box-sizing:border-box;}
   .close-x{float:right;cursor:pointer;color:var(--muted);font-weight:700;}
   .list-row{display:flex;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid #f4f5f7;font-size:13px;cursor:pointer;}
   .ctx-menu{position:fixed;background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 8px 20px rgba(0,0,0,.2);padding:6px;z-index:90;min-width:180px;}
   .ctx-item{padding:9px 12px;font-size:13px;font-weight:600;border-radius:7px;cursor:pointer;}
   .ctx-item:hover{background:#f4f5f7;}
+  
+  /* PM Floating & Center Popup */
   #pm-container{position:fixed;bottom:0;right:16px;display:flex;gap:10px;align-items:flex-end;z-index:60;}
   .pm-window{width:280px;background:#fff;border:1px solid var(--line);border-radius:12px 12px 0 0;box-shadow:0 -8px 24px rgba(0,0,0,.1);display:flex;flex-direction:column;}
   .pm-header{display:flex;justify-content:space-between;padding:10px 12px;border-bottom:1px solid var(--line);font-weight:700;font-size:13px;cursor:pointer;background:var(--dot);color:#fff;border-radius:12px 12px 0 0;}
@@ -61,6 +72,8 @@
   .pm-footer input{flex:1;padding:8px;font-size:12.5px;}
   .pm-msg{max-width:85%;padding:6px 10px;border-radius:10px;background:#f4f5f7;font-size:13px;}
   .pm-msg.mine{align-self:flex-end;background:var(--dot-soft);}
+  
+  .pm-popup-center{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;padding:24px;border-radius:16px;box-shadow:0 10px 40px rgba(0,0,0,.3);z-index:120;width:320px;text-align:center;}
 </style>
 </head>
 <body>
@@ -92,7 +105,7 @@
 <div id="shell" class="hidden">
   <div id="topbar-mobile">
     <div class="topbar-btn" id="tb-profile"><span class="tb-icon" id="tb-profile-avatar">🙂</span><span class="tb-label">Profile</span></div>
-    <div class="topbar-btn" id="tb-friends"><span class="tb-icon">👥</span><span class="tb-label">Friends</span></div>
+    <div class="topbar-btn" id="tb-pms"><span class="tb-icon">✉️</span><span class="tb-label">PMs</span></div>
     <div class="topbar-btn" id="tb-rooms"><span class="tb-icon">💬</span><span class="tb-label">Rooms</span></div>
     <div class="topbar-btn" id="tb-dots"><span class="tb-icon">🪙</span><span class="tb-label" id="tb-dots-count">0</span></div>
     <div class="topbar-btn" id="tb-games"><span class="tb-icon">🎮</span><span class="tb-label">Games</span></div>
@@ -114,10 +127,11 @@
 <div id="modal-root"></div>
 <div id="context-root"></div>
 <div id="pm-container"></div>
+<div id="pm-popup-root"></div>
 
 <script>
 const API = "https://dotverse-api.erfanzrd98.workers.dev";
-let currentUser = null, currentRoom = "1", msgInterval = null;
+let currentUser = null, currentRoom = "1", msgInterval = null, inboxInterval = null, lastInboxId = 0;
 const AVATARS = ["🙂","😎","🐱","🐼","🦊","🐸","👽","🤖","🌟","🔥","🍀","🌙","👑"];
 const COLORS = ["#000000","#2563eb","#dc2626","#16a34a","#9333ea","#ea580c","#0891b2","#db2777","#c9971f"];
 const openPMs = {};
@@ -157,6 +171,7 @@ function startApp(){
   loadRooms();
   joinRoom('1');
   setInterval(loadRooms, 10000);
+  startInboxPolling();
 }
 
 function updateTopBar(){
@@ -164,9 +179,38 @@ function updateTopBar(){
   el('tb-dots-count').textContent = currentUser.isDotMaster?'∞':currentUser.dots;
 }
 
-function openModal(t,b,wide){el('modal-root').innerHTML=`<div class="modal-backdrop" onclick="if(event.target===this)closeModal()"><div class="modal-card ${wide?'wide':''}"><span class="close-x" onclick="closeModal()">✕</span><h3>${t}</h3>${b}</div></div>`;}
+// Inbox Polling for Center Popups
+function startInboxPolling(){
+  if(inboxInterval) clearInterval(inboxInterval);
+  checkInbox(); // initial check
+  inboxInterval = setInterval(checkInbox, 3000);
+}
+async function checkInbox(){
+  if(!currentUser) return;
+  try{
+    const r=await fetch(API+'/api/get-inbox?username='+currentUser.username);
+    const d=await r.json();
+    if(d.success && d.msg && d.msg.id > lastInboxId){
+      lastInboxId = d.msg.id;
+      if(d.msg.sender !== currentUser.username){ // Don't popup our own messages
+        showPMPopup(d.msg.sender, d.msg.text);
+      }
+    }
+  }catch(e){}
+}
+function showPMPopup(sender, text){
+  const popup=document.createElement('div');
+  popup.className='pm-popup-center';
+  popup.innerHTML=`<h3 style="margin:0 0 10px;">✉️ New PM from ${escapeHtml(sender)}</h3><p style="margin:0 0 20px;color:var(--ink);font-size:15px;">${escapeHtml(text)}</p><button class="btn" style="margin-top:0;" onclick="openPM('${sender}');this.parentElement.remove();">Reply</button><button class="btn btn-danger" style="margin-top:8px;background:#ef4444;" onclick="this.parentElement.remove();">Close</button>`;
+  el('pm-popup-root').appendChild(popup);
+  setTimeout(()=>{if(popup.parentElement)popup.remove();}, 10000); // auto close
+}
+
+// Modals
+function openModal(t,b,wide){el('modal-root').innerHTML=`<div class="modal-backdrop" onclick="if(event.target===this)closeModal()"><div class="modal-card ${wide?'wide':''}"><span class="close-x" onclick="closeModal()">✕</span><h3 style="margin:0 0 16px;font-size:16px;">${t}</h3>${b}</div></div>`;}
 function closeModal(){el('modal-root').innerHTML='';}
 
+// Context Menu
 function showCtx(e,u){
   e.stopPropagation();
   const m=document.createElement('div');
@@ -184,6 +228,7 @@ function showCtx(e,u){
 function closeCtx(){el('context-root').innerHTML='';}
 window.onclick=closeCtx;
 
+// Rooms
 async function loadRooms(){
   try{
     const r=await fetch(API+'/api/rooms');const d=await r.json();
@@ -219,12 +264,15 @@ async function loadMessages(){
 el('btn-send').onclick=async()=>{
   const t=el('msg-input').value.trim();if(!t)return;el('msg-input').value='';
   try{
-    await fetch(API+'/api/send-message',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({room_id:currentRoom,username:currentUser.username,avatar:currentUser.avatar,text:t,nameColor:currentUser.nameColor})});
+    const r=await fetch(API+'/api/send-message',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({room_id:currentRoom,username:currentUser.username,avatar:currentUser.avatar,text:t,nameColor:currentUser.nameColor})});
+    const d=await r.json();
+    if(!d.success) alert(d.message);
     loadMessages();
   }catch(e){}
 };
 el('msg-input').addEventListener('keydown',e=>{if(e.key==='Enter')el('btn-send').click();});
 
+// Topbar Actions
 el('tb-rooms').onclick=async()=>{
   const r=await fetch(API+'/api/rooms');const d=await r.json();
   let rows='';
@@ -239,11 +287,15 @@ async function createRoomPrompt(){
   if(d.success){alert('Room created!');closeModal();loadRooms();}else{alert(d.message);}
 }
 
+// Profile Modal (with ID, Username, Password)
 el('tb-profile').onclick=()=>{
   let avHtml=AVATARS.map(a=>`<span class="avatar-emoji" style="width:36px;height:36px;font-size:18px;cursor:pointer;border:2px solid transparent;" onclick="selAvatar('${a}',this)">${a}</span>`).join('');
   let coHtml=COLORS.map(c=>`<span style="width:28px;height:28px;border-radius:50%;background:${c};cursor:pointer;display:inline-block;margin:2px;border:2px solid transparent;" onclick="selColor('${c}',this)"></span>`).join('');
   openModal('Profile',`
     <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;" id="av-grid">${avHtml}</div>
+    <div class="list-row"><span>User ID</span><b style="color:var(--muted)">#${currentUser.id}</b></div>
+    <label class="field">Username</label><input type="text" id="p-username" value="${escapeHtml(currentUser.username)}" />
+    <label class="field">New Password (leave blank to keep)</label><input type="password" id="p-password" placeholder="••••••" />
     <label class="field">City</label><input type="text" id="p-city" value="${escapeHtml(currentUser.city||'')}" />
     <label class="field">Name Color (2 dots)</label><div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:16px;" id="col-grid">${coHtml}</div>
     <div style="display:flex;justify-content:space-between;font-size:13px;margin:10px 0;"><span>Dots: <b>${currentUser.isDotMaster?'∞':currentUser.dots}</b></span><span>Score: <b>${currentUser.score}</b></span></div>
@@ -255,7 +307,15 @@ el('tb-profile').onclick=()=>{
 window.selAvatar=(a,e)=>{window._av=a;e.parentElement.querySelectorAll('.avatar-emoji').forEach(x=>x.style.border='2px solid transparent');e.style.border='2px solid var(--dot)';};
 window.selColor=(c,e)=>{window._co=c;e.parentElement.querySelectorAll('span').forEach(x=>x.style.border='2px solid transparent');e.style.border='2px solid #000';};
 window.saveProfile=async()=>{
-  const r=await fetch(API+'/api/update-profile',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:currentUser.username,avatar:window._av,gender:currentUser.gender,city:el('p-city').value,nameColor:window._co})});
+  const r=await fetch(API+'/api/update-profile',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+    username:currentUser.username,
+    newUsername:el('p-username').value.trim(),
+    newPassword:el('p-password').value,
+    avatar:window._av,
+    gender:currentUser.gender,
+    city:el('p-city').value,
+    nameColor:window._co
+  })});
   const d=await r.json();
   if(d.success){currentUser=d.user;updateTopBar();alert('Saved!');closeModal();}else{alert(d.message);}
 };
@@ -284,12 +344,17 @@ async function transferDotsPrompt(to,amt){
   if(d.success)alert('Sent!');else alert(d.message);
 }
 
-el('tb-friends').onclick=async()=>{
+// Friends & PMs Button
+el('tb-pms').onclick=async()=>{
   let friends=JSON.parse(currentUser.friends||'[]');
   let rows='';
-  if(friends.length===0)rows='<p style="color:var(--muted);text-align:center;">No friends yet.</p>';
+  if(friends.length===0)rows='<p style="color:var(--muted);text-align:center;">No friends yet. Tap a user in chat to add them.</p>';
   friends.forEach(f=>{rows+=`<div class="list-row" onclick="openPM('${f}')"><span style="flex:1;font-weight:600;">${escapeHtml(f)}</span><span>💬</span></div>`;});
-  openModal('Friends',rows);
+  rows+=`<button class="btn" style="margin-top:16px;" onclick="startNewPM()">Start New PM</button>`;
+  openModal('Private Messages',rows);
+};
+window.startNewPM=()=>{
+  const u=prompt('Enter username to PM:');if(u)openPM(u);
 };
 window.addFriend=async(u)=>{
   const r=await fetch(API+'/api/add-friend',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:currentUser.username,friend:u})});
@@ -297,6 +362,7 @@ window.addFriend=async(u)=>{
   if(d.success){currentUser.friends=JSON.stringify([...JSON.parse(currentUser.friends||'[]'),u]);alert('Added!');}
 };
 
+// Profile View
 window.viewProfile=async(u)=>{
   const r=await fetch(API+'/api/user?username='+u);const d=await r.json();
   if(d.success){
@@ -318,6 +384,7 @@ window.payFine=async(u,fine)=>{
   if(d.success)alert('User unbanned!');else alert('Failed');
 };
 
+// PM System
 window.openPM=async(u)=>{
   if(openPMs[u])return;
   const win=document.createElement('div');
@@ -349,6 +416,7 @@ window.sendPM=async(u)=>{
   await fetch(API+'/api/send-pm',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sender:currentUser.username,receiver:u,text:t})});
 };
 
+// Roulette
 el('tb-games').onclick=()=>{
   openModal('Roulette',`
     <label class="field">Bet Type</label>
@@ -370,6 +438,7 @@ window.playRoulette=async()=>{
   }else{el('rl-res').textContent=d.message;}
 };
 
+// Room Info
 el('tb-roominfo').onclick=async()=>{
   const r=await fetch(API+'/api/rooms');const d=await r.json();
   const room=d.rooms.find(x=>x.id==currentRoom);
@@ -383,6 +452,7 @@ el('tb-roominfo').onclick=async()=>{
   }
 };
 
+// Admin Panel
 el('tb-admin').onclick=()=>{
   openModal('Admin Panel 👑',`
     <button class="btn" onclick="adminGiveDots()">Give Dots</button>
