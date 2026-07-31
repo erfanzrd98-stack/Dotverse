@@ -167,8 +167,6 @@
     </div>
 
     <script type="module">
-        window.onerror = function(msg, url, line, col, error) { alert("Error: " + msg); }; // Catch all errors
-        
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getDatabase, ref, set, get, child, onValue, push, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
@@ -216,37 +214,46 @@
         window.closeScreens = function() { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); };
         window.toggleBetNumber = function() { document.getElementById('bet-number').style.display = document.getElementById('bet-type').value === 'number' ? 'block' : 'none'; };
 
-        window.login = function() {
-            const u = document.getElementById('username-input').value.trim();
-            const p = document.getElementById('password-input').value;
-            if(!u || !p) return alert("Enter info");
-            get(ref(db, 'users/' + u)).then((s) => {
-                if (s.exists()) {
-                    if(s.val().password === p) { currentUser = s.val(); startApp(); } 
-                    else { alert("Wrong password!"); }
-                } else { alert("User not found."); }
-            }).catch(err => alert("Login Error: " + err.message));
-        };
-
-        window.register = function() {
-            alert("Registering..."); // Debug alert
+        window.login = async function() {
             const u = document.getElementById('username-input').value.trim();
             const p = document.getElementById('password-input').value;
             if(!u || !p) return alert("Enter info");
             
-            get(ref(db, 'users/' + u)).then((s) => {
-                if (s.exists()) return alert("Username exists!");
-                get(ref(db, 'meta/userCount')).then(c => {
-                    let count = c.exists() ? c.val() : 1;
-                    if(count >= 10) return alert("Capacity full (10).");
-                    let newId = count + 1;
-                    let data = { id: newId, username: u, password: p, dots: 10, score: 0, joinDate: new Date().toLocaleDateString(), gender: "male", avatar: "👤", roomColor: "c-black", friends: {} };
-                    set(ref(db, 'users/' + u), data).then(() => {
-                        set(ref(db, 'meta/userCount'), newId);
-                        currentUser = data; startApp();
-                    }).catch(err => alert("DB Write Error: " + err.message)); 
-                }).catch(err => alert("DB Read Count Error: " + err.message)); 
-            }).catch(err => alert("DB Read User Error: " + err.message)); 
+            try {
+                const userSnap = await get(ref(db, 'users/' + u));
+                if (!userSnap.exists()) return alert("Error: User not found.");
+                if(userSnap.val().password !== p) return alert("Error: Wrong password!");
+                currentUser = userSnap.val();
+                startApp();
+            } catch (err) {
+                alert("Login Failed! Error: " + err.message);
+            }
+        };
+
+        window.register = async function() {
+            const u = document.getElementById('username-input').value.trim();
+            const p = document.getElementById('password-input').value;
+            if(!u || !p) return alert("Error: Enter username and password");
+            
+            try {
+                const userSnap = await get(ref(db, 'users/' + u));
+                if (userSnap.exists()) return alert("Error: Username already exists!");
+                
+                const countSnap = await get(ref(db, 'meta/userCount'));
+                let count = countSnap.exists() ? countSnap.val() : 1;
+                if(count >= 10) return alert("Error: Capacity full (10 users max).");
+                
+                let newId = count + 1;
+                let data = { id: newId, username: u, password: p, dots: 10, score: 0, joinDate: new Date().toLocaleDateString(), gender: "male", avatar: "👤", roomColor: "c-black", friends: {} };
+                
+                await set(ref(db, 'users/' + u), data);
+                await set(ref(db, 'meta/userCount'), newId);
+                
+                currentUser = data; 
+                startApp();
+            } catch (err) {
+                alert("Registration Failed! Error: " + err.message);
+            }
         };
 
         window.logout = function() {
