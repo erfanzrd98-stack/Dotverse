@@ -47,9 +47,6 @@
         .pm-msg { margin-bottom: 5px; }
         .pm-msg.sent { text-align: right; color: #0056b3; }
         .pm-msg.received { text-align: left; color: #333; }
-        
-        /* Disabled input style */
-        select:disabled { background-color: #f0f0f0; color: #888; }
     </style>
 </head>
 <body>
@@ -95,6 +92,7 @@
         
         <label>Avatar:</label>
         <select id="p-avatar">
+            <option value="👑">👑 (Admin Only)</option>
             <option value="👤">👤</option><option value="🦋">🦋</option><option value="🎀">🎀</option><option value="🎃">🎃</option><option value="⚽">⚽</option><option value="🏀">🏀</option><option value="🎱">🎱</option><option value="🎩">🎩</option><option value="🪬">🪬</option><option value="🔴">🔴</option><option value="🟠">🟠</option><option value="🟡">🟡</option><option value="🟢">🟢</option><option value="🔵">🔵</option><option value="🟣">🟣</option><option value="🟤">🟤</option><option value="⚫">⚫</option><option value="♣️">♣️</option><option value="♠️">♠️</option><option value="♥️">♥️</option><option value="♦️">♦️</option><option value="🌼">🌼</option><option value="🍄">🍄</option><option value="🌵">🌵</option><option value="🌴">🌴</option><option value="🐭">🐭</option><option value="🐰">🐰</option><option value="🦊">🦊</option><option value="🦄">🦄</option>
         </select>
         
@@ -256,7 +254,7 @@
                     if(s.val().password === p) { currentUser = s.val(); startApp(); } 
                     else { alert("Wrong password!"); }
                 } else { alert("User not found."); }
-            });
+            }).catch(err => alert("DB Error: " + err.message)); // Added error catch
         };
 
         window.register = function() {
@@ -273,9 +271,9 @@
                     set(ref(db, 'users/' + u), data).then(() => {
                         set(ref(db, 'meta/userCount'), newId);
                         currentUser = data; startApp();
-                    });
-                });
-            });
+                    }).catch(err => alert("DB Write Error: " + err.message)); // Added error catch
+                }).catch(err => alert("DB Read Error: " + err.message)); // Added error catch
+            }).catch(err => alert("DB Error: " + err.message)); // Added error catch
         };
 
         window.logout = function() {
@@ -296,16 +294,8 @@
             document.getElementById('p-id').innerText = currentUser.id;
             document.getElementById('p-score').innerText = currentUser.score;
             document.getElementById('p-date').innerText = currentUser.joinDate;
-            document.getElementById('p-avatar').value = currentUser.avatar;
-            document.getElementById('p-gender').value = currentUser.gender;
-            
-            // Disable avatar for DotMaster
-            if(currentUser.username === 'DotMaster') {
-                document.getElementById('p-avatar').disabled = true;
-            } else {
-                document.getElementById('p-avatar').disabled = false;
-            }
-            
+            document.getElementById('p-avatar').value = currentUser.avatar || '👤';
+            document.getElementById('p-gender').value = currentUser.gender || 'male';
             if(currentUser.roomColor) document.getElementById('p-room-color').value = currentUser.roomColor;
             switchRoom("Lobby", true);
         }
@@ -506,11 +496,14 @@
         }
 
         window.updateProfile = function() {
-            let newAvatar = currentUser.avatar; // Default to current
-            if(currentUser.username !== 'DotMaster') {
-                newAvatar = document.getElementById('p-avatar').value; // Only change if not admin
+            let newAvatar = document.getElementById('p-avatar').value;
+            
+            // Admin Avatar Check
+            if(newAvatar === '👑' && currentUser.username !== 'DotMaster') {
+                return alert("Only DotMaster can use the Crown avatar!");
             }
             
+            currentUser.avatar = newAvatar;
             currentUser.gender = document.getElementById('p-gender').value;
             let newColor = document.getElementById('p-room-color').value;
             
@@ -519,7 +512,7 @@
                 currentUser.dots -= 2;
                 currentUser.roomColor = newColor;
             }
-            update(ref(db, 'users/' + currentUser.username), { avatar: newAvatar, gender: currentUser.gender, roomColor: currentUser.roomColor, dots: currentUser.dots });
+            update(ref(db, 'users/' + currentUser.username), { avatar: currentUser.avatar, gender: currentUser.gender, roomColor: currentUser.roomColor, dots: currentUser.dots });
             alert("Saved!"); closeScreens();
         }
 
