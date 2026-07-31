@@ -46,8 +46,6 @@
   .btn-primary{ width:100%; background:var(--dot); color:#fff; margin-top:20px; }
   .btn-primary:disabled{ opacity:.5; cursor:default; }
   .btn-sm{ padding:7px 12px; font-size:12.5px; border-radius:8px; background:#f4f5f7; color:var(--ink); }
-  .btn-sm.danger{ color:var(--danger); }
-  .btn-sm.gold{ color:var(--gold); }
   .auth-msg{ font-size:13px; margin-top:12px; min-height:16px; }
   .auth-msg.error{ color:var(--danger); } .auth-msg.ok{ color:var(--online); }
 
@@ -77,10 +75,6 @@
   .room-item{ display:flex; align-items:center; gap:8px; padding:9px 10px; border-radius:9px; cursor:pointer; font-size:13.5px; font-weight:600; color:var(--muted); }
   .room-item.active{ background:var(--dot-soft); color:var(--dot); }
   .room-item .pill{ margin-left:auto; font-size:10.5px; font-weight:700; color:var(--muted); background:#f2f3f5; padding:2px 6px; border-radius:20px; }
-  .friend-item{ display:flex; align-items:center; gap:8px; padding:6px 10px; border-radius:9px; cursor:pointer; font-size:13px; }
-  .friend-item:hover{ background:#f7f8fa; }
-  .status-dot{ width:8px; height:8px; border-radius:50%; flex-shrink:0; }
-  .status-dot.online{ background:var(--online); } .status-dot.offline{ background:var(--offline); }
   .side-footer{ margin-top:auto; display:flex; flex-direction:column; gap:6px; }
   .profile-mini{ display:flex; align-items:center; gap:8px; padding:10px; border-radius:10px; border:1px solid var(--line); cursor:pointer; }
   .avatar-emoji{ font-size:20px; width:32px; height:32px; display:flex; align-items:center; justify-content:center; background:var(--dot-soft); border-radius:50%; flex-shrink:0; }
@@ -93,73 +87,19 @@
   #room-header .rscore{ font-size:12px; color:var(--muted); font-weight:600; }
   .header-actions{ display:flex; gap:8px; align-items:center; }
   #messages{ flex:1; overflow-y:auto; padding:18px 20px; display:flex; flex-direction:column; gap:12px; }
-  .pinned-banner{ background:#fff8e6; border:1px solid #f3e0a8; border-radius:10px; padding:8px 12px; font-size:12.5px; margin-bottom:6px; }
   .msg{ display:flex; gap:10px; max-width:640px; }
   .msg .avatar-emoji{ cursor:pointer; }
   .msg-body .msg-name{ font-size:12.5px; font-weight:700; margin-bottom:2px; cursor:pointer; display:inline-flex; align-items:center; gap:4px; }
   .msg-body .msg-text{ font-size:14px; line-height:1.45; word-break:break-word; }
-  .msg.system{ opacity:.6; font-size:12.5px; font-style:italic; }
-  .msg.system .msg-text{ font-size:12.5px; }
-  .role-badge{ font-size:9.5px; font-weight:800; padding:1px 5px; border-radius:5px; background:#eef0ff; color:var(--dot); }
   #composer{ display:flex; gap:10px; padding:14px 20px; border-top:1px solid var(--line); }
   #composer input{ flex:1; }
   #composer button{ padding:0 20px; }
-  .readonly-banner{ padding:8px 20px; font-size:12.5px; background:#fff0f0; color:var(--danger); border-top:1px solid var(--line); }
-
-  /* modal */
-  .modal-backdrop{ position:fixed; inset:0; background:rgba(20,24,31,.35); display:flex; align-items:center; justify-content:center; z-index:80; padding:20px; }
-  .modal-card{ background:#fff; border-radius:16px; padding:26px; width:100%; max-width:380px; max-height:86vh; overflow-y:auto;
-    box-shadow:0 20px 60px -20px rgba(0,0,0,.3); }
-  .modal-card.wide{ max-width:720px; }
-  .modal-card h3{ margin:0 0 16px; font-size:16px; }
-  .close-x{ float:right; cursor:pointer; color:var(--muted); font-weight:700; }
-  .avatar-picker{ display:flex; flex-wrap:wrap; gap:8px; margin:10px 0 18px; }
-  .avatar-opt{ width:36px; height:36px; border-radius:50%; background:var(--dot-soft); display:flex; align-items:center; justify-content:center;
-    font-size:18px; cursor:pointer; border:2px solid transparent; }
-  .avatar-opt.selected{ border-color:var(--dot); }
-  .color-picker{ display:flex; gap:8px; margin:10px 0 18px; flex-wrap:wrap; }
-  .color-opt{ width:28px; height:28px; border-radius:50%; cursor:pointer; border:2px solid transparent; }
-  .color-opt.selected{ border-color:#000; }
-  .kv-row{ display:flex; justify-content:space-between; font-size:13px; padding:6px 0; border-bottom:1px solid #f4f5f7; }
-  .kv-row b{ font-weight:700; }
-  .admin-tabs{ display:flex; gap:4px; margin-bottom:16px; border-bottom:1px solid var(--line); }
-  .admin-tab{ padding:8px 14px; font-size:13px; font-weight:700; color:var(--muted); cursor:pointer; border-bottom:2px solid transparent; }
-  .admin-tab.active{ color:var(--dot); border-color:var(--dot); }
-  .admin-panel-section{ display:none; } .admin-panel-section.active{ display:block; }
-  .list-row{ display:flex; align-items:center; gap:8px; padding:8px 0; border-bottom:1px solid #f4f5f7; font-size:12.5px; flex-wrap:wrap; }
-  .list-row .name{ font-weight:700; flex-shrink:0; min-width:90px; }
-  .list-row input, .list-row select{ padding:5px 7px; font-size:12px; border-radius:6px; }
-  .context-menu{ position:fixed; background:#fff; border:1px solid var(--line); border-radius:10px; box-shadow:0 12px 30px -10px rgba(0,0,0,.25);
-    padding:6px; z-index:90; min-width:180px; }
-  .context-item{ padding:9px 12px; font-size:13px; font-weight:600; border-radius:7px; cursor:pointer; }
-  .context-item:hover{ background:#f4f5f7; }
-  .context-item.danger{ color:var(--danger); }
-
-  /* PM floating windows */
-  #pm-container{ position:fixed; bottom:0; right:16px; display:flex; gap:10px; align-items:flex-end; z-index:60; }
-  .pm-window{ width:280px; background:#fff; border:1px solid var(--line); border-radius:12px 12px 0 0; box-shadow:0 -8px 24px -8px rgba(0,0,0,.15);
-    display:flex; flex-direction:column; }
-  .pm-header{ display:flex; align-items:center; justify-content:space-between; padding:10px 12px; border-bottom:1px solid var(--line); font-weight:700; font-size:13px; cursor:pointer; }
-  .pm-body{ height:220px; overflow-y:auto; padding:10px 12px; display:flex; flex-direction:column; gap:8px; font-size:13px; }
-  .pm-body.collapsed{ display:none; }
-  .pm-footer{ display:flex; gap:6px; padding:8px; border-top:1px solid var(--line); }
-  .pm-footer.collapsed{ display:none; }
-  .pm-footer input{ flex:1; padding:8px; font-size:12.5px; }
-  .pm-msg{ max-width:85%; padding:6px 10px; border-radius:10px; background:#f4f5f7; }
-  .pm-msg.mine{ align-self:flex-end; background:var(--dot-soft); }
-
-  .announce-banner{ position:fixed; top:16px; left:50%; transform:translateX(-50%); background:var(--ink); color:#fff;
-    padding:12px 20px; border-radius:12px; font-size:13.5px; font-weight:600; z-index:100; box-shadow:0 12px 30px -8px rgba(0,0,0,.4); }
-  .roulette-bets{ display:flex; flex-direction:column; gap:10px; }
-  .bet-row{ display:flex; gap:6px; align-items:center; font-size:13px; }
-  .bet-row select, .bet-row input{ font-size:13px; padding:6px; }
 </style>
 </head>
 <body>
 <div class="dot-grid-bg"></div>
 <div id="app">
 
-  <!-- AUTH SCREEN -->
   <div id="auth-screen" class="auth-wrap">
     <div class="auth-card">
       <div class="brand"><span class="brand-dot"></span><span class="brand-name">Dotverse</span></div>
@@ -180,38 +120,22 @@
         <input type="text" id="reg-username" />
         <label class="field">Password</label>
         <input type="password" id="reg-password" />
-        <label class="field">Gender</label>
-        <select class="field-input" id="reg-gender"><option value="male">Male</option><option value="female">Female</option></select>
-        <label class="field">City</label>
-        <input type="text" id="reg-city" />
         <button class="btn btn-primary" id="btn-register">Create account</button>
       </div>
       <div class="auth-msg" id="auth-msg"></div>
     </div>
   </div>
 
-  <!-- MAIN SHELL -->
   <div id="shell" class="hidden">
     <div id="topbar-mobile">
       <div class="topbar-btn" id="tb-profile"><span class="tb-icon" id="tb-profile-avatar">🙂</span><span class="tb-label">Profile</span></div>
-      <div class="topbar-btn" id="tb-friends"><span class="tb-icon">👥</span><span class="tb-label">Friends</span></div>
       <div class="topbar-btn" id="tb-rooms"><span class="tb-icon">💬</span><span class="tb-label">Rooms</span></div>
-      <div class="topbar-btn" id="tb-dots"><span class="tb-icon">🪙</span><span class="tb-label" id="tb-dots-count">0</span></div>
-      <div class="topbar-btn" id="tb-games"><span class="tb-icon">🎰</span><span class="tb-label">Games</span></div>
       <div class="topbar-btn hidden" id="tb-admin"><span class="tb-icon">👑</span><span class="tb-label">Admin</span></div>
-      <div class="topbar-btn" id="tb-roominfo"><span class="tb-icon">ℹ️</span><span class="tb-label">Room</span></div>
     </div>
     <div id="sidebar">
       <div class="side-brand"><span class="brand-dot"></span><span class="brand-name">Dotverse</span></div>
-
       <div class="side-section-title">Rooms</div>
       <div id="room-list"></div>
-      <div class="room-item" id="btn-create-room"><span>➕</span><span>Create room (5 dots)</span></div>
-      <div class="room-item" id="btn-open-roulette"><span>🎰</span><span>Roulette</span></div>
-
-      <div class="side-section-title">Friends</div>
-      <div id="friend-list" style="font-size:12.5px;color:var(--muted);">No friends yet.</div>
-
       <div class="side-footer">
         <div class="master-btn hidden" id="btn-open-dotmaster"><span>👑</span><span>DotMaster panel</span></div>
         <div class="profile-mini" id="open-profile">
@@ -223,16 +147,9 @@
 
     <div id="main">
       <div id="room-header">
-        <div class="rtitle">
-          <span id="room-title">Lobby</span><span class="rscore" id="room-meta">ID: 1</span>
-        </div>
-        <div class="header-actions">
-          <span class="btn btn-sm" id="btn-room-info">ℹ️ Room info</span>
-        </div>
+        <div class="rtitle"><span id="room-title">Lobby</span><span class="rscore" id="room-meta">ID: 1</span></div>
       </div>
-      <div id="pinned-wrap"></div>
       <div id="messages"></div>
-      <div id="readonly-notice" class="readonly-banner hidden">You're read-only in this room and can't send messages.</div>
       <div id="composer">
         <input type="text" id="msg-input" placeholder="Say something…" maxlength="500" />
         <button class="btn btn-primary" style="margin:0;width:auto;" id="btn-send">Send</button>
@@ -241,990 +158,118 @@
   </div>
 </div>
 
-<div id="pm-container"></div>
-<div id="modal-root"></div>
-<div id="context-root"></div>
-<div id="announce-root"></div>
-
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-
 <script>
-/* ====================== FIREBASE INIT ====================== */
-const firebaseConfig = {
-  apiKey: "AIzaSyDTd3EWgEh6ytP0a_GbWpAvmzpz8z6tPdY",
-  authDomain: "dotverse-12907.firebaseapp.com",
-  databaseURL: "https://dotverse-12907-default-rtdb.firebaseio.com",
-  projectId: "dotverse-12907",
-  storageBucket: "dotverse-12907.firebasestorage.app",
-  messagingSenderId: "342977939027",
-  appId: "1:342977939027:web:8e354d66f5c306ffb428a6",
-  measurementId: "G-CFWWLLTSJR"
-};
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const db = firebase.firestore();
-const FV = firebase.firestore.FieldValue;
-const now = () => firebase.firestore.Timestamp.now();
-
-/* ====================== CONSTANTS ====================== */
-const AVATARS = ["🙂","😎","🐱","🐼","🦊","🐸","👽","🤖","🌟","🔥","🍀","🌙"];
-const NAME_COLORS = ["#000000","#2563eb","#dc2626","#16a34a","#9333ea","#ea580c","#0891b2","#db2777"];
-const DAY_MS = 24*60*60*1000;
-let ECONOMY = { vipCost:1, roomCreateCost:5, colorChangeCost:2, rouletteMin:1, rouletteMax:100 };
-let CAPACITY = 10;
-
-let currentUser=null, currentUsername=null, currentRoom="1", currentRoomData=null;
-let unsubMessages=null, unsubRoomList=null, unsubRoomDoc=null, unsubFriends=null, unsubAnnounce=null;
-let lastAnnounceTs = localStorage.getItem('dotverse_last_announce') || "0";
-const openPMWindows = {}; // key -> {unsub}
+const API_URL = "https://dotverse-api.erfanzrd98.workers.dev";
+let currentUser = null;
+let currentRoom = "1";
+let msgInterval = null;
 
 function el(id){ return document.getElementById(id); }
-function openSidebar(){} function closeSidebar(){}
-document.addEventListener('DOMContentLoaded', ()=>{
-  el('tb-profile').onclick = ()=> el('open-profile').click();
-  el('tb-friends').onclick = openFriendsModal;
-  el('tb-rooms').onclick = openRoomsModal;
-  el('tb-dots').onclick = ()=> el('open-profile').click();
-  el('tb-games').onclick = ()=> el('btn-open-roulette').click();
-  el('tb-admin').onclick = ()=> el('btn-open-dotmaster').click();
-  el('tb-roominfo').onclick = ()=> el('btn-room-info').click();
-});
-function openFriendsModal(){
-  db.collection('users').doc(currentUsername).get().then(async (snap)=>{
-    const friends = (snap.data().friends)||[];
-    if(!friends.length){ openModal('Friends', '<p style="color:var(--muted);font-size:13.5px;">No friends yet. Tap a username in chat to add one.</p>', false); return; }
-    const docs = await Promise.all(friends.map(f=> db.collection('users').doc(f).get()));
-    const rows = docs.filter(d=>d.exists).map(d=>{
-      const f = d.data();
-      return `<div class="list-row" data-u="${d.id}" style="cursor:pointer;">
-        <span class="status-dot ${f.online?'online':'offline'}"></span>
-        <span class="avatar-emoji" style="width:26px;height:26px;font-size:15px;">${f.avatar||'🙂'}</span>
-        <span class="name" style="flex:1;">${escapeHtml(f.displayName||d.id)}</span>
-      </div>`;
-    }).join('');
-    openModal('Friends', rows, false);
-    document.querySelectorAll('#modal-root .list-row').forEach(row=>{
-      row.onclick = async ()=>{
-        const uid = row.dataset.u;
-        const d = await db.collection('users').doc(uid).get();
-        closeModal(); viewProfile(uid, d.data());
-      };
-    });
-  });
-}
-function openRoomsModal(){
-  db.collection('rooms').orderBy('score','desc').get().then(qs=>{
-    let rows = '';
-    qs.forEach(doc=>{
-      const r = doc.data(); const id = doc.id;
-      const icon = id==='1' ? '💬' : id==='2' ? '⭐' : '🏠';
-      const pillText = id==='2' ? ECONOMY.vipCost+' dot' : (r.score||0)+' pts';
-      rows += `<div class="list-row" data-r="${id}" style="cursor:pointer;">
-        <span>${icon}</span><span class="name" style="flex:1;">${escapeHtml(r.name)}</span><span class="pill">${pillText}</span>
-      </div>`;
-    });
-    rows += `<button class="btn btn-sm" style="width:100%;margin-top:14px;" id="rm-create">➕ Create room (${ECONOMY.roomCreateCost} dots)</button>`;
-    openModal('Chat rooms', rows, false);
-    document.querySelectorAll('#modal-root .list-row').forEach(row=>{
-      row.onclick = ()=>{ closeModal(); joinRoom(row.dataset.r); };
-    });
-    el('rm-create').onclick = ()=>{ closeModal(); el('btn-create-room').click(); };
-  });
-}
 function escapeHtml(s){ const d=document.createElement('div'); d.textContent=s??''; return d.innerHTML; }
-function simpleHash(str){ let h=0; for(let i=0;i<str.length;i++){ h=(Math.imul(31,h)+str.charCodeAt(i))|0; } return "h"+Math.abs(h).toString(36)+str.length; }
 function showMsg(text, ok){ const e=el('auth-msg'); e.textContent=text; e.className='auth-msg '+(ok?'ok':'error'); }
-function isPrivileged(room, username){
-  if(!room) return false;
-  if(currentUser && currentUser.isDotMaster) return true;
-  return room.creatorUsername===username || room.ownerUsername===username || (room.admins||[]).includes(username);
-}
-function roleBadge(room, username){
-  if(!room) return '';
-  if(room.creatorUsername===username) return '<span class="role-badge">CREATOR</span>';
-  if(room.ownerUsername===username) return '<span class="role-badge">OWNER</span>';
-  if((room.admins||[]).includes(username)) return '<span class="role-badge">ADMIN</span>';
-  return '';
-}
-function pmColorFor(score, gender){
-  if(score<=100) return gender==='female' ? '#f9a8d4' : '#93c5fd';
-  if(score<=200) return gender==='female' ? '#dc2626' : '#1d4ed8';
-  if(score<=1000) return '#c4b5fd';
-  if(score<=1500) return '#7c3aed';
-  if(score<=2000) return '#4b5563';
-  return '#eab308';
-}
 
-/* ====================== BOOTSTRAP (runs once, idempotent) ====================== */
-async function bootstrap(){
-  const settingsRef = db.collection('settings').doc('economy');
-  const capRef = db.collection('settings').doc('capacity');
-  const [esnap, csnap] = await Promise.all([settingsRef.get(), capRef.get()]);
-  if(!esnap.exists) await settingsRef.set(ECONOMY); else ECONOMY = Object.assign(ECONOMY, esnap.data());
-  if(!csnap.exists) await capRef.set({ max:10, nextId:2 }); else CAPACITY = csnap.data().max;
-
-  const masterRef = db.collection('users').doc('dotmaster');
-  const msnap = await masterRef.get();
-  if(!msnap.exists){
-    await masterRef.set({
-      username:'dotmaster', displayName:'DotMaster', passwordHash: simpleHash('113371'),
-      gender:'male', city:'', avatar:'👑', dots: 999999999, score: 0, userId: 1,
-      isDotMaster:true, canCreateRoom:true, friends:[], nameColor:'#c9971f', colorPurchased:true,
-      hidden:false, banUntil:null, banFine:0, createdAt: now(), online:false
-    });
-  }
-  const lobbyRef = db.collection('rooms').doc('1');
-  const lsnap = await lobbyRef.get();
-  if(!lsnap.exists){
-    await lobbyRef.set({ name:'Lobby', creatorUsername:'dotmaster', ownerUsername:'dotmaster', admins:[],
-      score:0, locked:false, muted:false, pinnedMessage:null, isDefault:true, readOnlyUsers:[], createdAt: now() });
-  }
-  const vipRef = db.collection('rooms').doc('2');
-  const vsnap = await vipRef.get();
-  if(!vsnap.exists){
-    await vipRef.set({ name:'VIP', creatorUsername:'dotmaster', ownerUsername:'dotmaster', admins:[],
-      score:0, locked:false, muted:false, pinnedMessage:null, isDefault:true, readOnlyUsers:[], createdAt: now() });
-  }
-}
-
-/* ====================== AUTH TABS ====================== */
 el('tab-login').onclick=()=>{ el('tab-login').classList.add('active'); el('tab-register').classList.remove('active');
   el('form-login').classList.remove('hidden'); el('form-register').classList.add('hidden'); showMsg('',true); };
 el('tab-register').onclick=()=>{ el('tab-register').classList.add('active'); el('tab-login').classList.remove('active');
   el('form-register').classList.remove('hidden'); el('form-login').classList.add('hidden'); showMsg('',true); };
 
-/* ====================== REGISTER ====================== */
 el('btn-register').onclick = async () => {
-  const username = el('reg-username').value.trim();
-  const password = el('reg-password').value;
-  const gender = el('reg-gender').value;
-  const city = el('reg-city').value.trim();
-  if(!username||!password){ showMsg('Username and password are required.'); return; }
-  if(!/^[a-zA-Z0-9_]{3,16}$/.test(username)){ showMsg('Username: 3-16 letters, numbers, or _'); return; }
-  if(password.length<4){ showMsg('Password must be at least 4 characters.'); return; }
-  if(username.toLowerCase()==='dotmaster'){ showMsg('That username is reserved.'); return; }
-
+  const u = el('reg-username').value.trim();
+  const p = el('reg-password').value;
+  if(!u||!p){ showMsg('Username and password are required.'); return; }
   el('btn-register').disabled=true;
   try{
-    if(!auth.currentUser) await auth.signInAnonymously();
-    await bootstrap();
-    const userRef = db.collection('users').doc(username.toLowerCase());
-    const existing = await userRef.get();
-    if(existing.exists){ showMsg('That username is taken.'); el('btn-register').disabled=false; return; }
-
-    const capRef = db.collection('settings').doc('capacity');
-    const usersSnap = await db.collection('users').get();
-    const capSnap = await capRef.get();
-    const cap = capSnap.data();
-    if(usersSnap.size >= cap.max){ showMsg('Dotverse is full right now (capacity reached).'); el('btn-register').disabled=false; return; }
-    const myId = cap.nextId || (usersSnap.size+1);
-    await capRef.update({ nextId: myId+1 });
-
-    await userRef.set({
-      username, displayName: username, gender, city, passwordHash: simpleHash(password),
-      avatar:"🙂", dots:10, score:0, userId: myId, isDotMaster:false, canCreateRoom:true,
-      friends:[], nameColor:null, colorPurchased:false, hidden:false, banUntil:null, banFine:0,
-      createdAt: now(), authUid: auth.currentUser.uid, online:true
-    });
-    showMsg('Account created! Logging you in…', true);
-    await loginSession(username.toLowerCase());
-  }catch(e){ console.error(e); showMsg('Something went wrong: '+e.message); }
+    const res = await fetch(API_URL + '/api/register', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ username:u, password:p }) });
+    const data = await res.json();
+    if(data.success){ currentUser = data.user; startApp(); } else { showMsg(data.message || 'Registration failed.'); }
+  }catch(e){ showMsg('Network error: '+e.message); }
   el('btn-register').disabled=false;
 };
 
-/* ====================== LOGIN ====================== */
 el('btn-login').onclick = async () => {
-  const username = el('login-username').value.trim().toLowerCase();
-  const password = el('login-password').value;
-  if(!username||!password){ showMsg('Enter your username and password.'); return; }
+  const u = el('login-username').value.trim();
+  const p = el('login-password').value;
+  if(!u||!p){ showMsg('Enter your username and password.'); return; }
   el('btn-login').disabled=true;
   try{
-    if(!auth.currentUser) await auth.signInAnonymously();
-    await bootstrap();
-    const userRef = db.collection('users').doc(username);
-    const snap = await userRef.get();
-    if(!snap.exists){ showMsg('No account with that username.'); el('btn-login').disabled=false; return; }
-    const data = snap.data();
-    if(data.passwordHash !== simpleHash(password)){ showMsg('Wrong password.'); el('btn-login').disabled=false; return; }
-    if(data.banUntil && data.banUntil.toMillis() > Date.now()){
-      const mins = Math.ceil((data.banUntil.toMillis()-Date.now())/60000);
-      showMsg(`This account is banned for ${mins} more minute(s). Fine to unban: ${data.banFine||0} dots (ask another user to pay it from your profile view).`);
-      el('btn-login').disabled=false; return;
-    }
-    await userRef.update({ online:true, authUid: auth.currentUser.uid });
-    await loginSession(username);
-  }catch(e){ console.error(e); showMsg('Login failed: '+e.message); }
+    const res = await fetch(API_URL + '/api/login', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ username:u, password:p }) });
+    const data = await res.json();
+    if(data.success){ currentUser = data.user; startApp(); } else { showMsg(data.message || 'Login failed.'); }
+  }catch(e){ showMsg('Network error: '+e.message); }
   el('btn-login').disabled=false;
 };
 
-/* ====================== SESSION ====================== */
-async function loginSession(usernameId){
-  currentUsername = usernameId;
-  localStorage.setItem('dotverse_user', usernameId);
-  const snap = await db.collection('users').doc(usernameId).get();
-  currentUser = snap.data();
+function startApp(){
   el('auth-screen').classList.add('hidden');
   el('shell').classList.remove('hidden');
-  if(currentUser.isDotMaster){ el('btn-open-dotmaster').classList.remove('hidden'); el('tb-admin').classList.remove('hidden'); }
+  if(currentUser.isDotMaster === 1){ el('btn-open-dotmaster').classList.remove('hidden'); el('tb-admin').classList.remove('hidden'); }
   renderProfileMini();
-  subscribeRoomList();
-  subscribeFriends();
-  subscribeAnnouncements();
+  loadRooms();
   joinRoom('1');
-  setInterval(heartbeat, 30000);
+  setInterval(loadRooms, 5000);
 }
-async function heartbeat(){
-  if(!currentUsername) return;
-  try{ await db.collection('users').doc(currentUsername).update({ lastSeen: now() }); }catch(e){}
-}
-window.addEventListener('beforeunload', ()=>{
-  if(currentUsername){ db.collection('users').doc(currentUsername).update({ online:false }); }
-});
+
 function renderProfileMini(){
   el('mini-avatar').textContent = currentUser.avatar || '🙂';
-  el('mini-name').textContent = currentUser.displayName || currentUser.username;
+  el('mini-name').textContent = currentUser.username;
   el('mini-dots').textContent = currentUser.isDotMaster ? '∞ dots' : (currentUser.dots + ' dots');
-  if(el('tb-profile-avatar')) el('tb-profile-avatar').textContent = currentUser.avatar || '🙂';
-  if(el('tb-dots-count')) el('tb-dots-count').textContent = currentUser.isDotMaster ? '∞' : currentUser.dots;
-}
-window.addEventListener('load', async () => {
-  const saved = localStorage.getItem('dotverse_user');
-  if(saved){
-    try{
-      if(!auth.currentUser) await auth.signInAnonymously();
-      await bootstrap();
-      const snap = await db.collection('users').doc(saved).get();
-      if(snap.exists) await loginSession(saved); else localStorage.removeItem('dotverse_user');
-    }catch(e){ console.error(e); }
-  }
-});
-
-/* ====================== ROOM LIST ====================== */
-function subscribeRoomList(){
-  if(unsubRoomList) unsubRoomList();
-  unsubRoomList = db.collection('rooms').orderBy('score','desc').onSnapshot(qs=>{
-    const list = el('room-list'); list.innerHTML='';
-    qs.forEach(doc=>{
-      const r = doc.data(); const id = doc.id;
-      const div = document.createElement('div');
-      div.className = 'room-item' + (id===currentRoom ? ' active':'');
-      div.dataset.room = id;
-      const icon = id==='1' ? '💬' : id==='2' ? '⭐' : '🏠';
-      const pillText = id==='2' ? ECONOMY.vipCost+' dot' : (r.score||0)+' pts';
-      div.innerHTML = `<span>${icon}</span><span>${escapeHtml(r.name)}</span><span class="pill">${pillText}</span>`;
-      div.onclick = ()=> joinRoom(id);
-      list.appendChild(div);
-    });
-  });
 }
 
-/* ====================== JOIN ROOM ====================== */
-async function joinRoom(roomId){
-  closeSidebar();
-  const roomRef = db.collection('rooms').doc(roomId);
-  const snap = await roomRef.get();
-  if(!snap.exists) return;
-  const room = snap.data();
-
-  if(room.locked && !isPrivileged(room, currentUsername)){
-    alert('This room is locked.'); return;
-  }
-  if(roomId==='2' && !currentUser.isDotMaster){
-    const until = currentUser.vipUntil ? currentUser.vipUntil.toMillis() : 0;
-    if(until < Date.now()){
-      const ok = confirm(`VIP access costs ${ECONOMY.vipCost} dot(s) for 24 hours. Pay now?`);
-      if(!ok) return;
-      if(currentUser.dots < ECONOMY.vipCost){ alert('Not enough dots.'); return; }
-      const newUntil = firebase.firestore.Timestamp.fromMillis(Date.now()+DAY_MS);
-      await db.collection('users').doc(currentUsername).update({ dots: FV.increment(-ECONOMY.vipCost), vipUntil:newUntil });
-      await logTx('vip_purchase', currentUsername, 'dotmaster', ECONOMY.vipCost);
-      const fresh = await db.collection('users').doc(currentUsername).get();
-      currentUser = fresh.data(); renderProfileMini();
-    }
-  }
-
-  currentRoom = roomId; currentRoomData = room;
-  document.querySelectorAll('.room-item').forEach(i=>i.classList.toggle('active', i.dataset.room===roomId));
-  el('room-title').textContent = room.name;
-  el('room-meta').textContent = 'ID: '+roomId+' · '+(room.score||0)+' pts';
-  renderPinned(room);
-
-  const isRO = (room.readOnlyUsers||[]).includes(currentUsername);
-  el('readonly-notice').classList.toggle('hidden', !isRO);
-  el('composer').classList.toggle('hidden', isRO);
-
-  if(unsubRoomDoc) unsubRoomDoc();
-  unsubRoomDoc = roomRef.onSnapshot(s=>{
-    if(!s.exists) return;
-    currentRoomData = s.data();
-    el('room-meta').textContent = 'ID: '+roomId+' · '+(currentRoomData.score||0)+' pts';
-    renderPinned(currentRoomData);
-    const ro2 = (currentRoomData.readOnlyUsers||[]).includes(currentUsername);
-    el('readonly-notice').classList.toggle('hidden', !ro2);
-    el('composer').classList.toggle('hidden', ro2);
-  });
-
-  await cleanupOldMessages(roomId);
-  await postSystemMessage(roomId, `${currentUser.displayName||currentUser.username} joined the room.`);
-
-  if(unsubMessages) unsubMessages();
-  el('messages').innerHTML='';
-  unsubMessages = roomRef.collection('messages').orderBy('createdAt','asc').limitToLast(150).onSnapshot(qs=>{
-    el('messages').innerHTML='';
-    qs.forEach(doc=> renderMessage(doc.data()));
-    el('messages').scrollTop = el('messages').scrollHeight;
-  });
-}
-function renderPinned(room){
-  el('pinned-wrap').innerHTML = room.pinnedMessage ? `<div class="pinned-banner">📌 ${escapeHtml(room.pinnedMessage)}</div>` : '';
-}
-async function cleanupOldMessages(roomId){
+async function loadRooms(){
   try{
-    const cutoff = firebase.firestore.Timestamp.fromMillis(Date.now()-DAY_MS);
-    const old = await db.collection('rooms').doc(roomId).collection('messages').where('createdAt','<',cutoff).limit(200).get();
-    if(old.empty) return;
-    const batch = db.batch();
-    old.forEach(d=>batch.delete(d.ref));
-    await batch.commit();
-  }catch(e){ console.error('cleanup failed', e); }
-}
-async function postSystemMessage(roomId, text){
-  await db.collection('rooms').doc(roomId).collection('messages').add({
-    username:'system', avatar:'ℹ️', text, system:true, createdAt: now()
-  });
-}
-
-/* ====================== MESSAGES RENDER ====================== */
-function renderMessage(m){
-  const wrap = document.createElement('div');
-  wrap.className = 'msg' + (m.system ? ' system' : '');
-  if(m.system){
-    wrap.innerHTML = `<div class="msg-body"><div class="msg-text">${escapeHtml(m.text)}</div></div>`;
-  }else{
-    const badge = roleBadge(currentRoomData, m.username);
-    const color = m.nameColor || '#000000';
-    wrap.innerHTML = `
-      <span class="avatar-emoji" data-user="${escapeHtml(m.username)}">${m.avatar||'🙂'}</span>
-      <div class="msg-body">
-        <div class="msg-name" style="color:${color}" data-user="${escapeHtml(m.username)}">${escapeHtml(m.username)} ${badge}</div>
-        <div class="msg-text">${escapeHtml(m.text)}</div>
-      </div>`;
-    wrap.querySelectorAll('[data-user]').forEach(n=>{
-      n.onclick = (ev)=> openUserContextMenu(ev, m.username);
-    });
-  }
-  el('messages').appendChild(wrap);
-}
-
-/* ====================== SEND MESSAGE ====================== */
-async function sendMessage(){
-  const text = el('msg-input').value.trim();
-  if(!text || !currentUser) return;
-  if(currentRoomData && currentRoomData.muted && !isPrivileged(currentRoomData, currentUsername)){ alert('This room is muted. Only admins can send messages.'); return; }
-  if(currentRoomData && (currentRoomData.readOnlyUsers||[]).includes(currentUsername)){ return; }
-  el('msg-input').value='';
-  await db.collection('rooms').doc(currentRoom).collection('messages').add({
-    username: currentUser.displayName || currentUser.username, avatar: currentUser.avatar||'🙂',
-    text, nameColor: currentUser.nameColor || '#000000', createdAt: now()
-  });
-  await db.collection('rooms').doc(currentRoom).update({ score: FV.increment(1) });
-  if(!currentUser.isDotMaster){
-    const ref = db.collection('users').doc(currentUsername);
-    await db.runTransaction(async (t)=>{
-      const doc = await t.get(ref); const d = doc.data();
-      const newScore = (d.score||0)+1; let newDots = d.dots||0;
-      if(Math.floor(newScore/100) > Math.floor((d.score||0)/100)) newDots += 10;
-      t.update(ref, { score:newScore, dots:newDots });
-    });
-    const fresh = await ref.get(); currentUser = fresh.data(); renderProfileMini();
-  }
-}
-el('btn-send').onclick = sendMessage;
-el('msg-input').addEventListener('keydown', e=>{ if(e.key==='Enter') sendMessage(); });
-
-/* ====================== TRANSACTIONS LOG ====================== */
-async function logTx(type, from, to, amount){
-  await db.collection('transactions').add({ type, from, to, amount, createdAt: now() });
-}
-
-/* ====================== CREATE ROOM ====================== */
-el('btn-create-room').onclick = async () => {
-  closeSidebar();
-  if(!currentUser.canCreateRoom && !currentUser.isDotMaster){ alert('You are not allowed to create rooms.'); return; }
-  const name = prompt('Room name:');
-  if(!name || !name.trim()) return;
-  if(!currentUser.isDotMaster && currentUser.dots < ECONOMY.roomCreateCost){ alert('Not enough dots (need '+ECONOMY.roomCreateCost+').'); return; }
-  const newRoomRef = db.collection('rooms').doc();
-  await newRoomRef.set({
-    name: name.trim(), creatorUsername: currentUsername, ownerUsername: currentUsername, admins:[],
-    score:0, locked:false, muted:false, pinnedMessage:null, isDefault:false, readOnlyUsers:[], createdAt: now()
-  });
-  if(!currentUser.isDotMaster){
-    await db.collection('users').doc(currentUsername).update({ dots: FV.increment(-ECONOMY.roomCreateCost) });
-    await logTx('room_create', currentUsername, 'system', ECONOMY.roomCreateCost);
-    const fresh = await db.collection('users').doc(currentUsername).get(); currentUser = fresh.data(); renderProfileMini();
-  }
-  joinRoom(newRoomRef.id);
-};
-
-/* ====================== ROOM INFO MODAL ====================== */
-el('btn-room-info').onclick = () => {
-  const r = currentRoomData; if(!r) return;
-  const priv = isPrivileged(r, currentUsername);
-  const body = `
-    <div class="kv-row"><span>Name</span><b>${escapeHtml(r.name)}</b></div>
-    <div class="kv-row"><span>ID</span><b>${currentRoom}</b></div>
-    <div class="kv-row"><span>Score</span><b>${r.score||0}</b></div>
-    <div class="kv-row"><span>Creator</span><b>${escapeHtml(r.creatorUsername)}</b></div>
-    <div class="kv-row"><span>Owner</span><b>${escapeHtml(r.ownerUsername)}</b></div>
-    <div class="kv-row"><span>Admins</span><b>${(r.admins||[]).join(', ')||'—'}</b></div>
-    <button class="btn btn-sm" style="width:100%;margin-top:14px;" id="btn-donate">Donate 1 dot = 100 room score</button>
-    ${priv ? `
-    <hr style="margin:16px 0;border:none;border-top:1px solid var(--line);">
-    <label class="field">Rename room</label>
-    <input type="text" id="ri-rename" value="${escapeHtml(r.name)}" />
-    <label class="field">Pin a message</label>
-    <input type="text" id="ri-pin" value="${escapeHtml(r.pinnedMessage||'')}" placeholder="Pinned text…" />
-    <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;">
-      <button class="btn btn-sm" id="ri-save">Save changes</button>
-      <button class="btn btn-sm" id="ri-lock">${r.locked?'Unlock room':'Lock room'}</button>
-      <button class="btn btn-sm" id="ri-mute">${r.muted?'Unmute room':'Mute room (admins only)'}</button>
-      <button class="btn btn-sm danger" id="ri-clear">Clear history</button>
-      ${!r.isDefault ? `<button class="btn btn-sm danger" id="ri-delete">Delete room</button>` : ''}
-    </div>` : ''}
-  `;
-  openModal('Room info', body, false);
-  el('btn-donate').onclick = async ()=>{
-    const amt = prompt('How many dots to donate? (1 dot = 100 room score)');
-    const n = parseInt(amt); if(!n || n<1) return;
-    if(!currentUser.isDotMaster && currentUser.dots < n){ alert('Not enough dots.'); return; }
-    if(!currentUser.isDotMaster) await db.collection('users').doc(currentUsername).update({ dots: FV.increment(-n) });
-    await db.collection('rooms').doc(currentRoom).update({ score: FV.increment(n*100) });
-    await logTx('room_donate', currentUsername, currentRoom, n);
-    if(!currentUser.isDotMaster){ const fresh = await db.collection('users').doc(currentUsername).get(); currentUser=fresh.data(); renderProfileMini(); }
-    closeModal();
-  };
-  if(priv){
-    el('ri-save').onclick = async ()=>{
-      await db.collection('rooms').doc(currentRoom).update({ name: el('ri-rename').value.trim()||r.name, pinnedMessage: el('ri-pin').value.trim()||null });
-      closeModal();
-    };
-    el('ri-lock').onclick = async ()=>{ await db.collection('rooms').doc(currentRoom).update({ locked: !r.locked }); closeModal(); };
-    el('ri-mute').onclick = async ()=>{ await db.collection('rooms').doc(currentRoom).update({ muted: !r.muted }); closeModal(); };
-    el('ri-clear').onclick = async ()=>{
-      if(!confirm('Delete all messages in this room?')) return;
-      const all = await db.collection('rooms').doc(currentRoom).collection('messages').get();
-      const batch = db.batch(); all.forEach(d=>batch.delete(d.ref)); await batch.commit();
-      closeModal();
-    };
-    if(el('ri-delete')) el('ri-delete').onclick = async ()=>{
-      if(!confirm('Delete this room permanently?')) return;
-      await db.collection('rooms').doc(currentRoom).delete();
-      closeModal(); joinRoom('1');
-    };
-  }
-};
-
-/* ====================== GENERIC MODAL HELPERS ====================== */
-function openModal(title, bodyHtml, wide){
-  el('modal-root').innerHTML = `
-    <div class="modal-backdrop" id="generic-modal-backdrop">
-      <div class="modal-card ${wide?'wide':''}">
-        <span class="close-x" id="generic-modal-close">✕</span>
-        <h3>${title}</h3>
-        ${bodyHtml}
-      </div>
-    </div>`;
-  el('generic-modal-close').onclick = closeModal;
-  el('generic-modal-backdrop').onclick = (e)=>{ if(e.target.id==='generic-modal-backdrop') closeModal(); };
-}
-function closeModal(){ el('modal-root').innerHTML=''; }
-
-/* ====================== USER CONTEXT MENU ====================== */
-function openUserContextMenu(ev, targetUsername){
-  ev.stopPropagation();
-  db.collection('users').where('displayName','==',targetUsername).limit(1).get().then(qs=>{
-    let targetDoc = qs.empty ? null : qs.docs[0];
-    if(!targetDoc){
-      return db.collection('users').doc(targetUsername.toLowerCase()).get().then(d=> renderMenu(d));
-    }
-    renderMenu(targetDoc);
-  });
-
-  function renderMenu(doc){
-    if(!doc || !doc.exists) return;
-    const targetId = doc.id; const target = doc.data();
-    const isFriend = (currentUser.friends||[]).includes(targetId);
-    const priv = isPrivileged(currentRoomData, currentUsername) && targetId !== currentUsername;
-    const isRO = (currentRoomData.readOnlyUsers||[]).includes(targetId);
-    const items = [];
-    if(targetId !== currentUsername){
-      items.push(['💬 Private message', ()=> openPM(targetId, target)]);
-    }
-    items.push(['👤 View profile', ()=> viewProfile(targetId, target)]);
-    if(targetId !== currentUsername){
-      items.push([isFriend ? '➖ Remove friend' : '➕ Add friend', async ()=>{
-        const ref = db.collection('users').doc(currentUsername);
-        await ref.update({ friends: isFriend ? FV.arrayRemove(targetId) : FV.arrayUnion(targetId) });
-        const fresh = await ref.get(); currentUser = fresh.data();
-        closeContextMenu();
-      }]);
-      items.push(['🪙 Send dots', async ()=>{
-        closeContextMenu();
-        const amt = prompt('How many dots to send to '+targetId+'?');
-        const n = parseInt(amt); if(!n||n<1) return;
-        if(!currentUser.isDotMaster && currentUser.dots < n){ alert('Not enough dots.'); return; }
-        if(!currentUser.isDotMaster) await db.collection('users').doc(currentUsername).update({ dots: FV.increment(-n) });
-        await db.collection('users').doc(targetId).update({ dots: FV.increment(n) });
-        await logTx('gift', currentUsername, targetId, n);
-        if(!currentUser.isDotMaster){ const fresh = await db.collection('users').doc(currentUsername).get(); currentUser=fresh.data(); renderProfileMini(); }
-      }]);
-    }
-    if(priv){
-      items.push(['⭐ Make admin', async ()=>{
-        await db.collection('rooms').doc(currentRoom).update({ admins: FV.arrayUnion(targetId) });
-        closeContextMenu();
-      }]);
-      items.push([isRO ? '🔓 Remove read-only' : '🔒 Set read-only', async ()=>{
-        await db.collection('rooms').doc(currentRoom).update({ readOnlyUsers: isRO ? FV.arrayRemove(targetId) : FV.arrayUnion(targetId) });
-        closeContextMenu();
-      }]);
-    }
-    const menu = document.createElement('div');
-    menu.className = 'context-menu';
-    menu.style.left = Math.min(ev.clientX, window.innerWidth-200)+'px';
-    menu.style.top = Math.min(ev.clientY, window.innerHeight-260)+'px';
-    menu.innerHTML = items.map((it,i)=>`<div class="context-item" data-i="${i}">${it[0]}</div>`).join('');
-    el('context-root').innerHTML=''; el('context-root').appendChild(menu);
-    menu.querySelectorAll('.context-item').forEach((n,i)=> n.onclick = items[i][1]);
-    setTimeout(()=> document.addEventListener('click', closeContextMenu, { once:true }), 0);
-  }
-}
-function closeContextMenu(){ el('context-root').innerHTML=''; }
-
-function viewProfile(targetId, target){
-  const joined = target.createdAt ? target.createdAt.toDate().toLocaleDateString() : '—';
-  const online = target.online ? 'online' : 'offline';
-  const body = `
-    <div style="text-align:center;margin-bottom:14px;"><span style="font-size:40px;">${target.avatar||'🙂'}</span></div>
-    <div class="kv-row"><span>Username</span><b>${escapeHtml(target.displayName||targetId)}</b></div>
-    <div class="kv-row"><span>ID</span><b>#${target.userId||'—'}</b></div>
-    <div class="kv-row"><span>Gender</span><b>${target.gender||'—'}</b></div>
-    <div class="kv-row"><span>City</span><b>${escapeHtml(target.city||'—')}</b></div>
-    <div class="kv-row"><span>Joined</span><b>${joined}</b></div>
-    <div class="kv-row"><span>Score</span><b>${target.score||0}</b></div>
-    <div class="kv-row"><span>Status</span><b>${online}</b></div>
-    ${target.banUntil && target.banUntil.toMillis()>Date.now() ? `
-      <div class="kv-row"><span>Banned until</span><b>${target.banUntil.toDate().toLocaleString()}</b></div>
-      <button class="btn btn-sm gold" style="width:100%;margin-top:10px;" id="btn-pay-fine">Pay fine (${target.banFine||0} dots) to unban</button>
-    ` : ''}
-  `;
-  openModal('Profile', body, false);
-  if(el('btn-pay-fine')) el('btn-pay-fine').onclick = async ()=>{
-    const fine = target.banFine||0;
-    if(!currentUser.isDotMaster && currentUser.dots < fine){ alert('Not enough dots.'); return; }
-    if(!currentUser.isDotMaster) await db.collection('users').doc(currentUsername).update({ dots: FV.increment(-fine) });
-    await db.collection('users').doc('dotmaster').update({});
-    await db.collection('users').doc(targetId).update({ banUntil:null, banFine:0 });
-    await logTx('unban_fine', currentUsername, targetId, fine);
-    if(!currentUser.isDotMaster){ const fresh = await db.collection('users').doc(currentUsername).get(); currentUser=fresh.data(); renderProfileMini(); }
-    closeModal();
-  };
-}
-
-/* ====================== FRIENDS SIDEBAR ====================== */
-function subscribeFriends(){
-  if(unsubFriends) unsubFriends();
-  unsubFriends = db.collection('users').doc(currentUsername).onSnapshot(async (snap)=>{
-    currentUser = snap.data();
-    const friends = currentUser.friends || [];
-    const wrap = el('friend-list');
-    if(!friends.length){ wrap.innerHTML='No friends yet.'; return; }
-    const docs = await Promise.all(friends.map(f=> db.collection('users').doc(f).get()));
-    wrap.innerHTML='';
-    docs.forEach(d=>{
-      if(!d.exists) return; const f = d.data();
-      const row = document.createElement('div');
-      row.className = 'friend-item';
-      row.innerHTML = `<span class="status-dot ${f.online?'online':'offline'}"></span><span class="avatar-emoji" style="width:24px;height:24px;font-size:14px;">${f.avatar||'🙂'}</span><span>${escapeHtml(f.displayName||d.id)}</span>`;
-      row.onclick = ()=> viewProfile(d.id, f);
-      wrap.appendChild(row);
-    });
-  });
-}
-
-/* ====================== PROFILE MODAL ====================== */
-el('open-profile').onclick = () => {
-  closeSidebar();
-  const body = `
-    <div class="avatar-picker" id="avatar-picker"></div>
-    <label class="field">Display name</label>
-    <input type="text" id="p-username" value="${escapeHtml(currentUser.displayName||currentUser.username)}" />
-    <label class="field">New password (leave blank to keep)</label>
-    <input type="password" id="p-password" placeholder="••••••" />
-    <label class="field">City</label>
-    <input type="text" id="p-city" value="${escapeHtml(currentUser.city||'')}" />
-    <label class="field">Name color in public chat (${ECONOMY.colorChangeCost} dots)</label>
-    <div class="color-picker" id="color-picker"></div>
-    <div style="font-size:12.5px;color:var(--muted);margin:10px 0;">
-      Dots: <b>${currentUser.isDotMaster?'∞':currentUser.dots}</b> · Score: <b>${currentUser.score}</b> · ID: <b>#${currentUser.userId}</b>
-    </div>
-    <label class="field">Have a gift code?</label>
-    <div style="display:flex;gap:6px;">
-      <input type="text" id="p-giftcode" placeholder="CODE" style="flex:1;" />
-      <button class="btn btn-sm" id="p-redeem">Redeem</button>
-    </div>
-    <button class="btn btn-primary" id="btn-save-profile">Save changes</button>
-    <button class="btn" style="width:100%;background:#f4f5f7;color:var(--danger);margin-top:8px;" id="btn-logout">Log out</button>
-  `;
-  openModal('Your profile', body, false);
-  const picker = el('avatar-picker'); picker.innerHTML='';
-  AVATARS.forEach(a=>{
-    const d = document.createElement('div');
-    d.className = 'avatar-opt'+(a===currentUser.avatar?' selected':'');
-    d.textContent = a;
-    d.onclick = ()=>{ document.querySelectorAll('.avatar-opt').forEach(x=>x.classList.remove('selected')); d.classList.add('selected'); };
-    picker.appendChild(d);
-  });
-  const cpicker = el('color-picker'); cpicker.innerHTML='';
-  NAME_COLORS.forEach(c=>{
-    const d = document.createElement('div');
-    d.className = 'color-opt'+(c===(currentUser.nameColor||'#000000')?' selected':'');
-    d.style.background = c;
-    d.onclick = ()=>{ document.querySelectorAll('.color-opt').forEach(x=>x.classList.remove('selected')); d.classList.add('selected'); };
-    cpicker.appendChild(d);
-  });
-  el('p-redeem').onclick = async ()=>{
-    const code = el('p-giftcode').value.trim();
-    if(!code) return;
-    const ref = db.collection('giftCodes').doc(code);
-    const snap = await ref.get();
-    if(!snap.exists || snap.data().usesLeft<=0){ alert('Invalid or expired code.'); return; }
-    const amount = snap.data().amount;
-    await ref.update({ usesLeft: FV.increment(-1) });
-    await db.collection('users').doc(currentUsername).update({ dots: FV.increment(amount) });
-    await logTx('gift_code', code, currentUsername, amount);
-    alert('Redeemed '+amount+' dots!');
-    const fresh = await db.collection('users').doc(currentUsername).get(); currentUser=fresh.data(); renderProfileMini();
-    closeModal();
-  };
-  el('btn-save-profile').onclick = async () => {
-    const selectedAvatar = document.querySelector('.avatar-opt.selected');
-    const selectedColor = document.querySelector('.color-opt.selected');
-    const avatar = selectedAvatar ? selectedAvatar.textContent : currentUser.avatar;
-    const displayName = el('p-username').value.trim() || currentUser.displayName;
-    const city = el('p-city').value.trim();
-    const newPassword = el('p-password').value;
-    const updates = { avatar, displayName, city };
-
-    const wantsColor = selectedColor && selectedColor.style.background;
-    const colorHex = wantsColor ? rgbToHex(selectedColor.style.background) : null;
-    if(colorHex && colorHex !== (currentUser.nameColor||'#000000')){
-      if(!currentUser.isDotMaster){
-        if(currentUser.dots < ECONOMY.colorChangeCost){ alert('Not enough dots for a color change.'); return; }
-        updates.dots = FV.increment(-ECONOMY.colorChangeCost);
-        await logTx('color_change', currentUsername, 'system', ECONOMY.colorChangeCost);
-      }
-      updates.nameColor = colorHex; updates.colorPurchased = true;
-    }
-    if(newPassword){
-      if(newPassword.length<4){ alert('Password too short.'); return; }
-      updates.passwordHash = simpleHash(newPassword);
-    }
-    await db.collection('users').doc(currentUsername).update(updates);
-    const fresh = await db.collection('users').doc(currentUsername).get(); currentUser=fresh.data(); renderProfileMini();
-    closeModal();
-  };
-  el('btn-logout').onclick = async () => {
-    await db.collection('users').doc(currentUsername).update({ online:false });
-    localStorage.removeItem('dotverse_user'); location.reload();
-  };
-};
-function rgbToHex(rgb){
-  const m = rgb.match(/\d+/g); if(!m) return rgb;
-  return '#'+m.slice(0,3).map(x=>(+x).toString(16).padStart(2,'0')).join('');
-}
-
-/* ====================== ROULETTE ====================== */
-el('btn-open-roulette').onclick = () => {
-  closeSidebar();
-  const body = `
-    <div class="roulette-bets">
-      <div class="bet-row">
-        <select id="bet-type">
-          <option value="parity">Even / Odd (2x)</option>
-          <option value="dozen">Dozen 1-12/13-24/25-36 (3x)</option>
-          <option value="number">Exact number 0-36 (36x)</option>
-        </select>
-      </div>
-      <div class="bet-row" id="bet-detail-wrap"></div>
-      <div class="bet-row">
-        <span>Bet amount:</span>
-        <input type="number" id="bet-amount" min="${ECONOMY.rouletteMin}" max="${ECONOMY.rouletteMax}" value="${ECONOMY.rouletteMin}" style="width:80px;" />
-      </div>
-      <button class="btn btn-primary" id="btn-spin">Spin</button>
-      <div id="roulette-result" style="font-size:14px;font-weight:700;margin-top:6px;"></div>
-    </div>`;
-  openModal('Roulette', body, false);
-  function renderDetail(){
-    const t = el('bet-type').value;
-    const w = el('bet-detail-wrap');
-    if(t==='parity') w.innerHTML = `<select id="bet-parity"><option value="even">Even</option><option value="odd">Odd</option></select>`;
-    else if(t==='dozen') w.innerHTML = `<select id="bet-dozen"><option value="1">1-12</option><option value="2">13-24</option><option value="3">25-36</option></select>`;
-    else w.innerHTML = `<input type="number" id="bet-number" min="0" max="36" value="0" style="width:70px;" />`;
-  }
-  el('bet-type').onchange = renderDetail; renderDetail();
-
-  el('btn-spin').onclick = async () => {
-    const amt = Math.max(ECONOMY.rouletteMin, Math.min(ECONOMY.rouletteMax, parseInt(el('bet-amount').value)||0));
-    if(!currentUser.isDotMaster && currentUser.dots < amt){ el('roulette-result').textContent='Not enough dots.'; return; }
-    const n = Math.floor(Math.random()*37);
-    const type = el('bet-type').value;
-    let win=false, mult=0;
-    if(type==='parity'){
-      const pick = el('bet-parity').value; mult=2;
-      if(n!==0){ win = (pick==='even')===(n%2===0); }
-    }else if(type==='dozen'){
-      const pick = parseInt(el('bet-dozen').value); mult=3;
-      if(n!==0){ const d = n<=12?1:n<=24?2:3; win = d===pick; }
-    }else{
-      const pick = parseInt(el('bet-number').value); mult=36;
-      win = pick===n;
-    }
-    const delta = win ? amt*mult - amt : -amt;
-    if(!currentUser.isDotMaster) await db.collection('users').doc(currentUsername).update({ dots: FV.increment(delta) });
-    await logTx('roulette', currentUsername, 'system', delta);
-    el('roulette-result').textContent = `Ball landed on ${n}. ${win ? 'You won '+(amt*mult-amt)+' dots!' : 'You lost '+amt+' dots.'}`;
-    if(!currentUser.isDotMaster){ const fresh = await db.collection('users').doc(currentUsername).get(); currentUser=fresh.data(); renderProfileMini(); }
-  };
-};
-
-/* ====================== PRIVATE MESSAGES ====================== */
-function pmKey(a,b){ return [a,b].sort().join('__'); }
-function openPM(targetId, targetData){
-  if(openPMWindows[targetId]) return;
-  const key = pmKey(currentUsername, targetId);
-  const win = document.createElement('div');
-  win.className = 'pm-window';
-  win.id = 'pmwin-'+targetId;
-  win.innerHTML = `
-    <div class="pm-header" data-toggle="${targetId}"><span>${escapeHtml(targetData.displayName||targetId)}</span><span>✕</span></div>
-    <div class="pm-body" id="pmbody-${targetId}"></div>
-    <div class="pm-footer"><input type="text" id="pminput-${targetId}" placeholder="Message…"/><button class="btn btn-sm" id="pmsend-${targetId}">Send</button></div>
-  `;
-  el('pm-container').appendChild(win);
-  win.querySelector('.pm-header span:last-child').onclick = (e)=>{ e.stopPropagation(); closePM(targetId); };
-  win.querySelector('.pm-header').onclick = ()=>{
-    win.querySelector('.pm-body').classList.toggle('collapsed');
-    win.querySelector('.pm-footer').classList.toggle('collapsed');
-  };
-  const unsub = db.collection('privateMessages').doc(key).collection('messages').orderBy('createdAt','asc').limitToLast(80)
-    .onSnapshot(qs=>{
-      const body = el('pmbody-'+targetId); if(!body) return; body.innerHTML='';
-      qs.forEach(doc=>{
-        const m = doc.data();
-        const d = document.createElement('div');
-        d.className = 'pm-msg' + (m.sender===currentUsername?' mine':'');
-        d.textContent = m.text;
-        body.appendChild(d);
+    const res = await fetch(API_URL + '/api/rooms');
+    const data = await res.json();
+    if(data.success){
+      const list = el('room-list'); list.innerHTML='';
+      data.rooms.forEach(r => {
+        const div = document.createElement('div');
+        div.className = 'room-item' + (r.id == currentRoom ? ' active':'');
+        const icon = r.id===1 ? '💬' : r.id===2 ? '⭐' : '🏠';
+        div.innerHTML = `<span>${icon}</span><span>${escapeHtml(r.name)}</span><span class="pill">${r.score||0}</span>`;
+        div.onclick = ()=> joinRoom(r.id);
+        list.appendChild(div);
       });
-      body.scrollTop = body.scrollHeight;
-    });
-  openPMWindows[targetId] = { unsub };
-  el('pmsend-'+targetId).onclick = ()=> sendPM(targetId, key);
-  el('pminput-'+targetId).addEventListener('keydown', e=>{ if(e.key==='Enter') sendPM(targetId, key); });
-  closeContextMenu();
-}
-async function sendPM(targetId, key){
-  const input = el('pminput-'+targetId); const text = input.value.trim();
-  if(!text) return; input.value='';
-  await db.collection('privateMessages').doc(key).collection('messages').add({ sender: currentUsername, text, createdAt: now() });
-}
-function closePM(targetId){
-  if(openPMWindows[targetId]){ openPMWindows[targetId].unsub(); delete openPMWindows[targetId]; }
-  const w = el('pmwin-'+targetId); if(w) w.remove();
-}
-
-/* ====================== GLOBAL ANNOUNCEMENTS ====================== */
-function subscribeAnnouncements(){
-  if(unsubAnnounce) unsubAnnounce();
-  unsubAnnounce = db.collection('announcements').doc('current').onSnapshot(snap=>{
-    if(!snap.exists) return;
-    const data = snap.data();
-    const ts = data.createdAt ? String(data.createdAt.toMillis()) : "0";
-    if(ts !== lastAnnounceTs){
-      lastAnnounceTs = ts; localStorage.setItem('dotverse_last_announce', ts);
-      const banner = document.createElement('div');
-      banner.className = 'announce-banner';
-      banner.textContent = '📢 '+data.text;
-      el('announce-root').appendChild(banner);
-      setTimeout(()=> banner.remove(), 8000);
     }
-  });
+  }catch(e){}
 }
 
-/* ====================== DOTMASTER PANEL ====================== */
-el('btn-open-dotmaster').onclick = async () => {
-  closeSidebar();
-  const body = `
-    <div class="admin-tabs">
-      <div class="admin-tab active" data-t="users">Users</div>
-      <div class="admin-tab" data-t="rooms">Rooms</div>
-      <div class="admin-tab" data-t="messages">Messages</div>
-      <div class="admin-tab" data-t="economy">Economy & Stats</div>
-    </div>
-    <div class="admin-panel-section active" id="tab-users"><div id="admin-users-list">Loading…</div></div>
-    <div class="admin-panel-section" id="tab-rooms"><div id="admin-rooms-list">Loading…</div></div>
-    <div class="admin-panel-section" id="tab-messages">
-      <label class="field">Global announcement</label>
-      <input type="text" id="am-text" placeholder="Message to all users…" />
-      <button class="btn btn-sm" id="am-send" style="margin-top:8px;">Send announcement</button>
-      <label class="field" style="margin-top:20px;">Hidden mode</label>
-      <button class="btn btn-sm" id="am-hidden">${currentUser.hidden ? 'Disable hidden mode' : 'Enable hidden mode'}</button>
-    </div>
-    <div class="admin-panel-section" id="tab-economy">
-      <label class="field">VIP cost (dots / 24h)</label><input type="number" id="ec-vip" value="${ECONOMY.vipCost}" />
-      <label class="field">Room creation cost</label><input type="number" id="ec-room" value="${ECONOMY.roomCreateCost}" />
-      <label class="field">Name color cost</label><input type="number" id="ec-color" value="${ECONOMY.colorChangeCost}" />
-      <label class="field">Roulette min bet</label><input type="number" id="ec-rmin" value="${ECONOMY.rouletteMin}" />
-      <label class="field">Roulette max bet</label><input type="number" id="ec-rmax" value="${ECONOMY.rouletteMax}" />
-      <label class="field">Registration capacity</label><input type="number" id="ec-cap" value="${CAPACITY}" />
-      <button class="btn btn-sm" id="ec-save" style="margin-top:10px;">Save economy settings</button>
-      <hr style="margin:18px 0;border:none;border-top:1px solid var(--line);">
-      <label class="field">Create gift code</label>
-      <div style="display:flex;gap:6px;">
-        <input type="number" id="gc-amount" placeholder="Amount" style="width:90px;" />
-        <input type="number" id="gc-uses" placeholder="Uses" style="width:70px;" />
-        <button class="btn btn-sm" id="gc-create">Create</button>
-      </div>
-      <div id="gc-result" style="font-size:12.5px;margin-top:6px;"></div>
-      <hr style="margin:18px 0;border:none;border-top:1px solid var(--line);">
-      <label class="field">Recent transactions</label>
-      <div id="tx-log" style="font-size:12px;max-height:180px;overflow-y:auto;"></div>
-    </div>
-  `;
-  openModal('DotMaster panel', body, true);
-  document.querySelectorAll('.admin-tab').forEach(t=>{
-    t.onclick = ()=>{
-      document.querySelectorAll('.admin-tab').forEach(x=>x.classList.remove('active'));
-      document.querySelectorAll('.admin-panel-section').forEach(x=>x.classList.remove('active'));
-      t.classList.add('active'); el('tab-'+t.dataset.t).classList.add('active');
-    };
-  });
+async function joinRoom(roomId){
+  currentRoom = roomId;
+  if(msgInterval) clearInterval(msgInterval);
+  loadMessages();
+  msgInterval = setInterval(loadMessages, 2000);
+}
 
-  // USERS TAB
-  const usersSnap = await db.collection('users').get();
-  const uWrap = el('admin-users-list'); uWrap.innerHTML='';
-  usersSnap.forEach(doc=>{
-    const u = doc.data(); const uid = doc.id;
-    const row = document.createElement('div'); row.className='list-row';
-    row.innerHTML = `
-      <span class="name">${escapeHtml(u.displayName||uid)} #${u.userId||'?'}</span>
-      <input type="number" placeholder="±score" style="width:70px;" id="score-${uid}" />
-      <button class="btn btn-sm" data-a="score" data-u="${uid}">Apply</button>
-      <button class="btn btn-sm" data-a="resetpw" data-u="${uid}">Reset PW</button>
-      <button class="btn btn-sm" data-a="toggleroom" data-u="${uid}">${u.canCreateRoom?'Revoke room create':'Allow room create'}</button>
-      <button class="btn btn-sm danger" data-a="ban" data-u="${uid}">Ban</button>
-      <button class="btn btn-sm" data-a="hidepm" data-u="${uid}">View PMs</button>
-    `;
-    uWrap.appendChild(row);
-  });
-  uWrap.querySelectorAll('button').forEach(btn=>{
-    btn.onclick = async ()=>{
-      const uid = btn.dataset.u; const action = btn.dataset.a;
-      if(action==='score'){
-        const delta = parseInt(el('score-'+uid).value)||0;
-        await db.collection('users').doc(uid).update({ score: FV.increment(delta) });
-        alert('Score updated.');
-      }else if(action==='resetpw'){
-        const np = prompt('New password for '+uid+':');
-        if(np && np.length>=4) await db.collection('users').doc(uid).update({ passwordHash: simpleHash(np) });
-      }else if(action==='toggleroom'){
-        const snap = await db.collection('users').doc(uid).get();
-        await db.collection('users').doc(uid).update({ canCreateRoom: !snap.data().canCreateRoom });
-        btn.textContent = snap.data().canCreateRoom ? 'Allow room create' : 'Revoke room create';
-      }else if(action==='ban'){
-        const mins = parseInt(prompt('Ban duration (minutes):'))||0;
-        const fine = parseInt(prompt('Fine to unban (dots):'))||0;
-        if(mins>0){
-          const until = firebase.firestore.Timestamp.fromMillis(Date.now()+mins*60000);
-          await db.collection('users').doc(uid).update({ banUntil: until, banFine: fine, online:false });
-        }
-      }else if(action==='hidepm'){
-        const other = prompt('View PMs between "'+uid+'" and which user?');
-        if(!other) return;
-        const key = pmKey(uid, other.trim().toLowerCase());
-        const msgs = await db.collection('privateMessages').doc(key).collection('messages').orderBy('createdAt','asc').limitToLast(50).get();
-        const lines = msgs.docs.map(d=>d.data().sender+': '+d.data().text).join('\n') || '(no messages)';
-        alert(lines);
-      }
-    };
-  });
+async function loadMessages(){
+  try{
+    const res = await fetch(API_URL + '/api/messages?room_id=' + currentRoom);
+    const data = await res.json();
+    if(data.success){
+      const wrap = el('messages'); wrap.innerHTML='';
+      data.messages.forEach(m => {
+        const div = document.createElement('div');
+        div.className = 'msg';
+        div.innerHTML = `<span class="avatar-emoji">${m.avatar||'🙂'}</span><div class="msg-body"><div class="msg-name" style="color:${m.nameColor||'#000'}">${escapeHtml(m.username)}</div><div class="msg-text">${escapeHtml(m.text)}</div></div>`;
+        wrap.appendChild(div);
+      });
+      wrap.scrollTop = wrap.scrollHeight;
+    }
+  }catch(e){}
+}
 
-  // ROOMS TAB
-  const roomsSnap = await db.collection('rooms').get();
-  const rWrap = el('admin-rooms-list'); rWrap.innerHTML='';
-  roomsSnap.forEach(doc=>{
-    const r = doc.data(); const rid = doc.id;
-    const row = document.createElement('div'); row.className='list-row';
-    row.innerHTML = `
-      <span class="name">${escapeHtml(r.name)} (${rid})</span>
-      <button class="btn btn-sm" data-a="lock" data-r="${rid}">${r.locked?'Unlock':'Lock'}</button>
-      <button class="btn btn-sm" data-a="mute" data-r="${rid}">${r.muted?'Unmute':'Mute'}</button>
-      <button class="btn btn-sm" data-a="clear" data-r="${rid}">Clear</button>
-      ${!r.isDefault ? `<button class="btn btn-sm danger" data-a="delete" data-r="${rid}">Delete</button>` : ''}
-    `;
-    rWrap.appendChild(row);
-  });
-  rWrap.querySelectorAll('button').forEach(btn=>{
-    btn.onclick = async ()=>{
-      const rid = btn.dataset.r; const action = btn.dataset.a;
-      const ref = db.collection('rooms').doc(rid); const snap = await ref.get(); const r = snap.data();
-      if(action==='lock') await ref.update({ locked: !r.locked });
-      else if(action==='mute') await ref.update({ muted: !r.muted });
-      else if(action==='clear'){ const all = await ref.collection('messages').get(); const b=db.batch(); all.forEach(d=>b.delete(d.ref)); await b.commit(); }
-      else if(action==='delete'){ if(confirm('Delete room?')) await ref.delete(); }
-    };
-  });
-
-  // MESSAGES TAB
-  el('am-send').onclick = async ()=>{
-    const text = el('am-text').value.trim(); if(!text) return;
-    await db.collection('announcements').doc('current').set({ text, createdAt: now() });
-    el('am-text').value=''; alert('Announcement sent.');
-  };
-  el('am-hidden').onclick = async ()=>{
-    await db.collection('users').doc(currentUsername).update({ hidden: !currentUser.hidden });
-    closeModal();
-  };
-
-  // ECONOMY TAB
-  el('ec-save').onclick = async ()=>{
-    const newEco = {
-      vipCost: parseInt(el('ec-vip').value)||1, roomCreateCost: parseInt(el('ec-room').value)||5,
-      colorChangeCost: parseInt(el('ec-color').value)||2, rouletteMin: parseInt(el('ec-rmin').value)||1,
-      rouletteMax: parseInt(el('ec-rmax').value)||100
-    };
-    await db.collection('settings').doc('economy').set(newEco);
-    await db.collection('settings').doc('capacity').update({ max: parseInt(el('ec-cap').value)||10 });
-    ECONOMY = newEco; CAPACITY = parseInt(el('ec-cap').value)||10;
-    alert('Saved.');
-  };
-  el('gc-create').onclick = async ()=>{
-    const amount = parseInt(el('gc-amount').value)||0; const uses = parseInt(el('gc-uses').value)||1;
-    if(amount<=0){ alert('Enter an amount.'); return; }
-    const code = Math.random().toString(36).slice(2,8).toUpperCase();
-    await db.collection('giftCodes').doc(code).set({ amount, usesLeft: uses });
-    el('gc-result').textContent = 'Code created: '+code;
-  };
-  const txSnap = await db.collection('transactions').orderBy('createdAt','desc').limit(50).get();
-  el('tx-log').innerHTML = txSnap.docs.map(d=>{
-    const t = d.data();
-    return `<div style="padding:3px 0;border-bottom:1px solid #f4f5f7;">${t.type}: ${t.from} → ${t.to} (${t.amount})</div>`;
-  }).join('') || 'No transactions yet.';
+el('btn-send').onclick = async () => {
+  const text = el('msg-input').value.trim();
+  if(!text) return;
+  el('msg-input').value='';
+  try{
+    await fetch(API_URL + '/api/send-message', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ room_id: currentRoom, username: currentUser.username, avatar: currentUser.avatar, text: text, nameColor: currentUser.nameColor }) });
+    loadMessages();
+  }catch(e){}
 };
+
+el('msg-input').addEventListener('keydown', e=>{ if(e.key==='Enter') el('btn-send').click(); });
+el('tb-rooms').onclick = ()=> alert('Rooms are listed on the left sidebar!');
+el('open-profile').onclick = ()=> alert('Profile editing coming next!');
 </script>
 </body>
 </html>
