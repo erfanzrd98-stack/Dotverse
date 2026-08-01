@@ -64,7 +64,7 @@
   .ctx-item{padding:9px 12px;font-size:13px;font-weight:600;border-radius:7px;cursor:pointer;}
   .ctx-item:hover{background:#f4f5f7;}
   
-  /* Center PM Popups Stack (Compact & Inset Text) */
+  /* Center PM Popups Stack */
   #pm-popup-root{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:120;display:flex;flex-direction:column;gap:10px;width:auto;max-width:90vw;align-items:center;}
   .pm-popup-card{width:fit-content;min-width:160px;max-width:240px;border-radius:10px;box-shadow:0 4px 15px rgba(0,0,0,0.3);display:flex;flex-direction:column;overflow:hidden;padding:6px;}
   .pm-popup-header{padding:4px 8px;font-weight:bold;font-size:12px;display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;}
@@ -80,6 +80,18 @@
   .pm-history-view{display:flex;flex-direction:column;gap:8px;max-height:50vh;overflow-y:auto;padding:10px;background:#f9f9f9;border-radius:8px;margin-bottom:16px;}
   .pm-history-msg{max-width:80%;padding:8px 12px;border-radius:8px;font-size:13px;word-break:break-word;}
   .pm-history-msg b{font-size:10px;display:block;margin-bottom:2px;opacity:0.8;}
+
+  /* Profile Mockup Styles */
+  .p-row{display:flex;align-items:center;border-bottom:1px solid #f4f5f7;padding:10px 0;}
+  .p-label{width:45%;font-size:13px;color:var(--muted);font-weight:600;border-right:1px solid var(--line);padding-right:10px;}
+  .p-val{width:55%;padding-left:10px;display:flex;justify-content:flex-end;}
+  .p-input, .p-select{width:100%;max-width:140px;border:1px solid var(--line);border-radius:6px;padding:6px 10px;font-size:13px;background:#f9f9f9;outline:none;text-align:right;}
+  .p-input:focus, .p-select:focus{border-color:var(--dot);background:#fff;}
+  .p-bubble{background:var(--dot-soft);color:var(--dot);padding:6px 16px;border-radius:20px;font-weight:700;font-size:13px;text-align:center;}
+  .p-btn-row{display:flex;gap:10px;margin-top:20px;}
+  .p-btn{flex:1;padding:10px;border:none;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer;}
+  .p-btn-save{background:var(--dot);color:#fff;}
+  .p-btn-logout{background:transparent;color:var(--danger);border:1px solid var(--danger);}
 </style>
 </head>
 <body>
@@ -146,7 +158,7 @@ function showMsg(t,ok){const e=el('auth-msg');e.textContent=t;e.className='auth-
 
 function getPmColor(user) {
     if (!user) return '#f0f0f0';
-    if (user.isDotMaster === 1) return '#f5780e'; // Hex code for DotMaster
+    if (user.isDotMaster === 1) return '#f5780e';
     let score = user.score || 0;
     let gender = user.gender || 'male';
     if (score <= 100) return gender === 'female' ? '#f9a8d4' : '#93c5fd';
@@ -208,7 +220,6 @@ function updateTopBar(){
   el('tb-dots-count').textContent = currentUser.isDotMaster?'∞':currentUser.dots;
 }
 
-// Popups for New Messages
 function startInboxPolling(){
   if(inboxInterval) clearInterval(inboxInterval);
   checkInbox();
@@ -259,7 +270,6 @@ function openPMPopup(sender, text, senderData) {
       <button style="background:#fff;color:#000;" onclick="sendReply('${sender}', '${popupId}')">Send</button>
     </div>
   `;
-           
   popup.innerHTML = html;
   el('pm-popup-root').appendChild(popup);
 }
@@ -281,7 +291,6 @@ async function sendReply(sender, popupId) {
   document.getElementById(popupId).remove(); 
 }
 
-// Modals
 function openModal(t,b,wide){el('modal-root').innerHTML=`<div class="modal-backdrop" onclick="if(event.target===this)closeModal()"><div class="modal-card ${wide?'wide':''}"><span class="close-x" onclick="closeModal()">✕</span><h3 style="margin:0 0 16px;font-size:16px;">${t}</h3>${b}</div></div>`;}
 function closeModal(){el('modal-root').innerHTML='';}
 
@@ -359,41 +368,83 @@ async function createRoomPrompt(){
   if(d.success){alert('Room created!');closeModal();loadRooms();}else{alert(d.message);}
 }
 
+// New Profile Modal Design
 el('tb-profile').onclick=()=>{
   const isMaster = currentUser.isDotMaster === 1;
   let avHtml;
   if (isMaster) {
-    avHtml = `<select disabled style="width:100%;"><option selected>👑 (Admin Only)</option></select>`;
+    avHtml = `<select class="p-select" disabled><option selected>👑</option></select>`;
   } else {
-    avHtml = `<select id="p-avatar-select" style="width:100%;" onchange="window._av=this.value">
+    avHtml = `<select id="p-avatar" class="p-select" onchange="window._av=this.value">
       ${AVATARS.map(a => `<option value="${a}" ${currentUser.avatar===a?'selected':''}>${a}</option>`).join('')}
     </select>`;
   }
-                        
-  let coHtml=COLORS.map(c=>`<span style="width:28px;height:28px;border-radius:50%;background:${c};cursor:pointer;display:inline-block;margin:2px;border:2px solid transparent;" onclick="selColor('${c}',this)"></span>`).join('');
-  
-  openModal('Profile',`
-    <label class="field">Avatar</label>
-    <div style="margin-bottom:16px;">${avHtml}</div>
-    <div class="list-row"><span>User ID</span><b style="color:var(--muted)">#${currentUser.id}</b></div>
-    <label class="field">Username</label><input type="text" id="p-username" value="${escapeHtml(currentUser.username)}" />
-    <label class="field">New Password (leave blank to keep)</label><input type="password" id="p-password" placeholder="••••••" />
-    <label class="field">City</label><input type="text" id="p-city" value="${escapeHtml(currentUser.city||'')}" />
-    <label class="field">Name Color (2 dots)</label><div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:16px;" id="col-grid">${coHtml}</div>
-    <div style="display:flex;justify-content:space-between;font-size:13px;margin:10px 0;"><span>Dots: <b>${currentUser.isDotMaster?'∞':currentUser.dots}</b></span><span>Score: <b>${currentUser.score}</b></span></div>
-    <button class="btn" onclick="saveProfile()">Save Changes</button>
-    <button class="btn btn-danger" style="margin-top:8px;background:#ef4444;" onclick="location.reload()">Logout</button>
+
+  let coHtml = `<select id="p-color" class="p-select" onchange="window._co=this.value">
+    ${COLORS.map(c => `<option value="${c}" ${currentUser.nameColor===c?'selected':''}>${c}</option>`).join('')}
+  </select>`;
+
+  let genderHtml = `<select id="p-gender" class="p-select" onchange="window._gender=this.value">
+    <option value="male" ${currentUser.gender==='male'?'selected':''}>Male</option>
+    <option value="female" ${currentUser.gender==='female'?'selected':''}>Female</option>
+  </select>`;
+
+  openModal('👤 Your Profile',`
+    <div style="max-width:320px;margin:0 auto;">
+      <div class="p-row">
+        <span class="p-label">Username</span>
+        <div class="p-val"><input type="text" id="p-username" class="p-input" value="${escapeHtml(currentUser.username)}"></div>
+      </div>
+      <div class="p-row">
+        <span class="p-label">Password</span>
+        <div class="p-val"><input type="password" id="p-password" class="p-input" placeholder="••••••"></div>
+      </div>
+      <div class="p-row">
+        <span class="p-label">Gender</span>
+        <div class="p-val">${genderHtml}</div>
+      </div>
+      <div class="p-row">
+        <span class="p-label">City</span>
+        <div class="p-val"><input type="text" id="p-city" class="p-input" value="${escapeHtml(currentUser.city||'')}"></div>
+      </div>
+      <div class="p-row">
+        <span class="p-label">Name color</span>
+        <div class="p-val">${coHtml}</div>
+      </div>
+      <div class="p-row">
+        <span class="p-label">Avatar</span>
+        <div class="p-val">${avHtml}</div>
+      </div>
+      <div class="p-row">
+        <span class="p-label">ID Number</span>
+        <div class="p-val"><span class="p-bubble">#${currentUser.id}</span></div>
+      </div>
+      <div class="p-row">
+        <span class="p-label">Dots</span>
+        <div class="p-val"><span class="p-bubble">${currentUser.isDotMaster?'∞':currentUser.dots}</span></div>
+      </div>
+      <div class="p-row" style="border-bottom:none;">
+        <span class="p-label">Rating</span>
+        <div class="p-val"><span class="p-bubble">${currentUser.score}</span></div>
+      </div>
+      <div class="p-btn-row">
+        <button class="p-btn p-btn-logout" onclick="location.reload()">Logout</button>
+        <button class="p-btn p-btn-save" onclick="saveProfile()">Save Changes</button>
+      </div>
+    </div>
   `);
-  window._av=currentUser.avatar;window._co=currentUser.nameColor;
+  window._av=currentUser.avatar;
+  window._co=currentUser.nameColor;
+  window._gender=currentUser.gender;
 };
-window.selColor=(c,e)=>{window._co=c;e.parentElement.querySelectorAll('span').forEach(x=>x.style.border='2px solid transparent');e.style.border='2px solid #000';};
+
 window.saveProfile=async()=>{
   const r=await fetch(API+'/api/update-profile',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
     username:currentUser.username,
     newUsername:el('p-username').value.trim(),
     newPassword:el('p-password').value,
     avatar:window._av,
-    gender:currentUser.gender,
+    gender:window._gender,
     city:el('p-city').value,
     nameColor:window._co
   })});
@@ -425,7 +476,6 @@ async function transferDotsPrompt(to,amt){
   if(d.success)alert('Sent!');else alert(d.message);
 }
 
-// PMs History Modal
 el('tb-pms').onclick=async()=>{
   let friends=JSON.parse(currentUser.friends||'[]');
   let rows='<p style="color:var(--muted);text-align:center;font-size:13px;margin-bottom:16px;">Select a user to view chat history.</p>';
