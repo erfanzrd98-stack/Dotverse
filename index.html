@@ -136,7 +136,7 @@
 
 <script>
 const API = "https://dotverse-api.erfanzrd98.workers.dev";
-let currentUser = null, currentRoom = "1", msgInterval = null, inboxInterval = null, lastInboxId = 0;
+let currentUser = null, currentRoom = "1", currentRoomData = null, msgInterval = null, inboxInterval = null, lastInboxId = 0;
 const AVATARS = ["🙂","😎","🐱","🐼","🦊","🐸","👽","🤖","🌟","🔥","🍀","🌙","👑"];
 const COLORS = ["#000000","#2563eb","#dc2626","#16a34a","#9333ea","#ea580c","#0891b2","#db2777","#f5780e"];
 
@@ -146,7 +146,7 @@ function showMsg(t,ok){const e=el('auth-msg');e.textContent=t;e.className='auth-
 
 function getPmColor(user) {
     if (!user) return '#f0f0f0';
-    if (user.isDotMaster === 1) return '#f5780e'; // Hex code for DotMaster
+    if (user.isDotMaster === 1) return '#f5780e';
     let score = user.score || 0;
     let gender = user.gender || 'male';
     if (score <= 100) return gender === 'female' ? '#f9a8d4' : '#93c5fd';
@@ -190,8 +190,7 @@ async function startApp(){
   el('shell').classList.remove('hidden');
   if(currentUser.isDotMaster===1) el('tb-admin').classList.remove('hidden');
   updateTopBar();
-  loadRooms();
-  joinRoom('1');
+  await joinRoom('1');
   setInterval(loadRooms, 10000);
   
   try {
@@ -208,7 +207,67 @@ function updateTopBar(){
   el('tb-dots-count').textContent = currentUser.isDotMaster?'∞':currentUser.dots;
 }
 
-// Popups for New Messages
+async function loadRooms(){
+  try{
+    const r=await fetch(API+'/api/rooms');const d=await r.json();
+    if(d.success){
+      currentRoomData = d.rooms.find(x=>x.id==currentRoom);
+      if(currentRoomData){
+        el('room-title').textContent=currentRoomData.name;
+        el('room-meta').textContent='ID: '+currentRoomData.id+' · '+currentRoomData.score+' pts';
+      }
+    }
+  }catch(e){}
+}
+
+async function joinRoom(id){
+  currentRoom=id;
+  if(msgInterval) clearInterval(msgInterval);
+  await loadRooms();
+  loadMessages();
+  msgInterval=setInterval(loadMessages,2000);
+  closeModal();
+}
+
+async function loadMessages(){
+  try{
+    const r=await fetch(API+'/api/messages?room_id='+currentRoom);const d=await r.json();
+    if(d.success){
+      const w=el('messages');w.innerHTML='';
+      d.messages.forEach(m=>{
+        const div=document.createElement('div');
+        if(m.username==='system'){div.className='sys-msg';div.textContent=m.text;}
+        else{
+          div.className='msg';
+          let displayAvatar = m.avatar||'🙂';
+          // Check if user has a role in this room
+          if(currentRoomData) {
+            const admins = JSON.parse(currentRoomData.admins || '[]');
+            if(m.username === currentRoomData.creator || m.username === currentRoomData.owner || admins.includes(m.username)) {
+              displayAvatar = '⭐';
+            }
+          }
+          div.innerHTML=`<span class="avatar-emoji" onclick="showCtx(event,'${m.username}')">${displayAvatar}</span>
+          <div class="msg-body"><span class="msg-name" style="color:${m.nameColor||'#000'}" onclick="showCtx(event,'${m.username}')">${escapeHtml(m.username)}</span><span class="msg-text">${escapeHtml(m.text)}</span></div>`;
+        }
+        w.appendChild(div);
+      });
+      w.scrollTop=w.scrollHeight;
+    }
+  }catch(e){}
+}
+
+el('btn-send').onclick=async()=>{
+  const t=el('msg-input').value.trim();if(!t)return;el('msg-input').value='';
+  try{
+    const r=await fetch(API+'/api/send-message',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({room_id:currentRoom,username:currentUser.username,avatar:currentUser.avatar,text:t,nameColor:currentUser.nameColor})});
+    const d=await r.json();
+    if(!d.success) alert(d.message);
+    loadMessages();
+  }catch(e){}
+};
+el('msg-input').addEventListener('keydown',e=>{if(e.key==='Enter')el('btn-send').click();});
+
 function startInboxPolling(){
   if(inboxInterval) clearInterval(inboxInterval);
   checkInbox();
@@ -259,7 +318,6 @@ function openPMPopup(sender, text, senderData) {
       <button style="background:#fff;color:#000;" onclick="sendReply('${sender}', '${popupId}')">Send</button>
     </div>
   `;
-           
   popup.innerHTML = html;
   el('pm-popup-root').appendChild(popup);
 }
@@ -281,7 +339,6 @@ async function sendReply(sender, popupId) {
   document.getElementById(popupId).remove(); 
 }
 
-// Modals
 function openModal(t,b,wide){el('modal-root').innerHTML=`<div class="modal-backdrop" onclick="if(event.target===this)closeModal()"><div class="modal-card ${wide?'wide':''}"><span class="close-x" onclick="closeModal()">✕</span><h3 style="margin:0 0 16px;font-size:16px;">${t}</h3>${b}</div></div>`;}
 function closeModal(){el('modal-root').innerHTML='';}
 
@@ -290,60 +347,21 @@ function showCtx(e,u){
   const m=document.createElement('div');
   m.className='ctx-menu';
   m.style.left=e.clientX+'px';m.style.top=e.clientY+'px';
+  
+  const canManage = currentUser.isDotMaster === 1 || (currentRoomData && (currentUser.username === currentRoomData.creator || currentUser.username === currentRoomData.owner));
+  
   m.innerHTML=`
     <div class="ctx-item" onclick="startNewPM('${u}');closeCtx();">💬 Private Message</div>
     <div class="ctx-item" onclick="viewProfile('${u}');closeCtx();">👤 View Profile</div>
     <div class="ctx-item" onclick="addFriend('${u}');closeCtx();">➕ Add Friend</div>
     <div class="ctx-item" onclick="sendDotsPrompt('${u}');closeCtx();">🪙 Send Dots</div>
+    ${canManage ? `<div class="ctx-item" onclick="makeAdmin('${u}');closeCtx();">⭐ Make Admin</div>` : ''}
     ${currentUser.isDotMaster===1?`<div class="ctx-item" onclick="banUser('${u}');closeCtx();">🔨 Ban User</div>`:''}
   `;
   el('context-root').innerHTML='';el('context-root').appendChild(m);
 }
 function closeCtx(){el('context-root').innerHTML='';}
 window.onclick=closeCtx;
-
-async function loadRooms(){
-  try{
-    const r=await fetch(API+'/api/rooms');const d=await r.json();
-    if(d.success){const room=d.rooms.find(x=>x.id==currentRoom);if(room){el('room-title').textContent=room.name;el('room-meta').textContent='ID: '+room.id+' · '+room.score+' pts';}}
-  }catch(e){}
-}
-async function joinRoom(id){
-  currentRoom=id;
-  if(msgInterval) clearInterval(msgInterval);
-  loadMessages();
-  msgInterval=setInterval(loadMessages,2000);
-  closeModal();
-}
-async function loadMessages(){
-  try{
-    const r=await fetch(API+'/api/messages?room_id='+currentRoom);const d=await r.json();
-    if(d.success){
-      const w=el('messages');w.innerHTML='';
-      d.messages.forEach(m=>{
-        const div=document.createElement('div');
-        if(m.username==='system'){div.className='sys-msg';div.textContent=m.text;}
-        else{
-          div.className='msg';
-          div.innerHTML=`<span class="avatar-emoji" onclick="showCtx(event,'${m.username}')">${m.avatar||'🙂'}</span>
-          <div class="msg-body"><span class="msg-name" style="color:${m.nameColor||'#000'}" onclick="showCtx(event,'${m.username}')">${escapeHtml(m.username)}</span><span class="msg-text">${escapeHtml(m.text)}</span></div>`;
-        }
-        w.appendChild(div);
-      });
-      w.scrollTop=w.scrollHeight;
-    }
-  }catch(e){}
-}
-el('btn-send').onclick=async()=>{
-  const t=el('msg-input').value.trim();if(!t)return;el('msg-input').value='';
-  try{
-    const r=await fetch(API+'/api/send-message',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({room_id:currentRoom,username:currentUser.username,avatar:currentUser.avatar,text:t,nameColor:currentUser.nameColor})});
-    const d=await r.json();
-    if(!d.success) alert(d.message);
-    loadMessages();
-  }catch(e){}
-};
-el('msg-input').addEventListener('keydown',e=>{if(e.key==='Enter')el('btn-send').click();});
 
 el('tb-rooms').onclick=async()=>{
   const r=await fetch(API+'/api/rooms');const d=await r.json();
@@ -358,6 +376,13 @@ async function createRoomPrompt(){
   const d=await r.json();
   if(d.success){alert('Room created!');closeModal();loadRooms();}else{alert(d.message);}
 }
+
+window.makeAdmin = async (u) => {
+  const r = await fetch(API+'/api/make-admin', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({room_id: currentRoom, username: u})});
+  const d = await r.json();
+  if(d.success) { alert('Admin added!'); loadRooms(); loadMessages(); }
+  else alert('Failed');
+};
 
 el('tb-profile').onclick=()=>{
   let avHtml=AVATARS.map(a=>`<span class="avatar-emoji" style="width:36px;height:36px;font-size:18px;cursor:pointer;border:2px solid transparent;" onclick="selAvatar('${a}',this)">${a}</span>`).join('');
@@ -415,7 +440,6 @@ async function transferDotsPrompt(to,amt){
   if(d.success)alert('Sent!');else alert(d.message);
 }
 
-// PMs History Modal
 el('tb-pms').onclick=async()=>{
   let friends=JSON.parse(currentUser.friends||'[]');
   let rows='<p style="color:var(--muted);text-align:center;font-size:13px;margin-bottom:16px;">Select a user to view chat history.</p>';
@@ -533,11 +557,14 @@ el('tb-roominfo').onclick=async()=>{
   const r=await fetch(API+'/api/rooms');const d=await r.json();
   const room=d.rooms.find(x=>x.id==currentRoom);
   if(room){
+    const admins = JSON.parse(room.admins || '[]').join(', ') || 'None';
     openModal('Room Info',`
       <div class="list-row"><span>Name</span><b>${room.name}</b></div>
       <div class="list-row"><span>ID</span><b>${room.id}</b></div>
       <div class="list-row"><span>Score</span><b>${room.score}</b></div>
       <div class="list-row"><span>Creator</span><b>${room.creator}</b></div>
+      <div class="list-row"><span>Owner</span><b>${room.owner}</b></div>
+      <div class="list-row"><span>Admins</span><b>${admins}</b></div>
     `);
   }
 };
