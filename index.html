@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 <title>Dotverse</title>
 <style>
-  :root{ --bg:#fff; --ink:#14181f; --muted:#6b7280; --line:#e7e9ee; --dot:#3d5afe; --dot-soft:#eef0ff; --danger:#e14b4b; --gold:#c9971f; }
+  :root{ --bg:#fff; --ink:#14181f; --muted:#6b7280; --line:#e7e9ee; --dot:#3d5afe; --dot-soft:#eef0ff; --danger:#e14b4b; }
   *{box-sizing:border-box;} html,body{height:100%;margin:0;font-family:'Segoe UI',sans-serif;background:var(--bg);color:var(--ink);overflow:hidden;}
   .hidden{display:none!important;}
   ::-webkit-scrollbar{width:8px;} ::-webkit-scrollbar-thumb{background:var(--line);border-radius:8px;}
@@ -64,16 +64,16 @@
   .ctx-item{padding:9px 12px;font-size:13px;font-weight:600;border-radius:7px;cursor:pointer;}
   .ctx-item:hover{background:#f4f5f7;}
   
-  /* Center PM Popups Stack */
-  #pm-popup-root{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:120;display:flex;flex-direction:column;gap:10px;width:90vw;max-width:350px;align-items:center;}
-  .pm-popup-card{width:fit-content;max-width:100%;min-width:180px;padding:15px;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.3);display:flex;flex-direction:column;gap:8px;}
-  .pm-popup-header{display:flex;justify-content:space-between;align-items:center;font-weight:bold;font-size:13px;border-bottom:1px solid rgba(255,255,255,0.3);padding-bottom:5px;margin-bottom:5px;}
-  .pm-popup-close{cursor:pointer;font-size:18px;opacity:0.8;}
-  .pm-popup-text{font-size:14px;word-break:break-word;white-space:pre-wrap;}
-  .pm-popup-footer{display:flex;flex-direction:column;gap:6px;margin-top:5px;}
-  .pm-popup-input{width:100%;padding:8px;border-radius:6px;border:1px solid rgba(0,0,0,0.2);background:rgba(255,255,255,0.9);color:#000;font-size:13px;}
-  .pm-popup-buttons{display:flex;gap:6px;}
-  .pm-popup-buttons button{flex:1;padding:8px;border:none;border-radius:6px;font-weight:700;cursor:pointer;font-size:12px;background:rgba(0,0,0,0.3);}
+  /* Center PM Popups Stack (Like the photo) */
+  #pm-popup-root{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:120;display:flex;flex-direction:column;gap:10px;width:90vw;max-width:320px;align-items:center;}
+  .pm-popup-card{width:100%;border-radius:12px;box-shadow:0 4px 15px rgba(0,0,0,0.3);display:flex;flex-direction:column;overflow:hidden;}
+  .pm-popup-header{padding:12px 15px;font-weight:bold;font-size:15px;display:flex;justify-content:space-between;align-items:center;background:rgba(0,0,0,0.2);}
+  .pm-popup-close{cursor:pointer;font-size:20px;opacity:0.8;}
+  .pm-popup-text{padding:20px 15px;font-size:15px;word-break:break-word;white-space:pre-wrap;flex:1;text-align:center;}
+  .pm-popup-actions{padding:10px;display:flex;gap:8px;}
+  .pm-popup-actions button{flex:1;padding:12px;border:none;border-radius:8px;font-weight:700;cursor:pointer;font-size:14px;background:rgba(255,255,255,0.9);}
+  .pm-popup-reply-box{padding:10px;display:flex;gap:8px;}
+  .pm-popup-reply-box input{flex:1;padding:10px;border-radius:6px;border:1px solid rgba(0,0,0,0.2);background:#fff;color:#000;font-size:14px;}
   
   /* PM History View */
   .pm-history-view{display:flex;flex-direction:column;gap:8px;max-height:50vh;overflow-y:auto;padding:10px;background:#f9f9f9;border-radius:8px;margin-bottom:16px;}
@@ -137,7 +137,7 @@
 const API = "https://dotverse-api.erfanzrd98.workers.dev";
 let currentUser = null, currentRoom = "1", msgInterval = null, inboxInterval = null, lastInboxId = 0;
 const AVATARS = ["🙂","😎","🐱","🐼","🦊","🐸","👽","🤖","🌟","🔥","🍀","🌙","👑"];
-const COLORS = ["#000000","#2563eb","#dc2626","#16a34a","#9333ea","#ea580c","#0891b2","#db2777","#c9971f"];
+const COLORS = ["#000000","#2563eb","#dc2626","#16a34a","#9333ea","#ea580c","#0891b2","#db2777","#f5780e"];
 
 function el(id){return document.getElementById(id);}
 function escapeHtml(s){const d=document.createElement('div');d.textContent=s??'';return d.innerHTML;}
@@ -145,7 +145,7 @@ function showMsg(t,ok){const e=el('auth-msg');e.textContent=t;e.className='auth-
 
 function getPmColor(user) {
     if (!user) return '#f0f0f0';
-    if (user.isDotMaster === 1) return '#c9971f'; // Gold
+    if (user.isDotMaster === 1) return '#f5780e'; // Hex code for DotMaster
     let score = user.score || 0;
     let gender = user.gender || 'male';
     if (score <= 100) return gender === 'female' ? '#f9a8d4' : '#93c5fd';
@@ -157,7 +157,7 @@ function getPmColor(user) {
 }
 
 function getTextColor(bgColor) {
-    const darkColors = ['#1d4ed8', '#dc2626', '#7c3aed', '#4b5563', '#c9971f'];
+    const darkColors = ['#1d4ed8', '#dc2626', '#7c3aed', '#4b5563', '#f5780e'];
     return darkColors.includes(bgColor) ? '#ffffff' : '#000000';
 }
 
@@ -193,7 +193,6 @@ async function startApp(){
   joinRoom('1');
   setInterval(loadRooms, 10000);
   
-  // FIX: Get the latest PM ID on login so old messages don't popup
   try {
     const rInit = await fetch(`${API}/api/get-last-pm-id?username=${currentUser.username}`);
     const dInit = await rInit.json();
@@ -212,7 +211,7 @@ function updateTopBar(){
 function startInboxPolling(){
   if(inboxInterval) clearInterval(inboxInterval);
   checkInbox();
-  inboxInterval = setInterval(checkInbox, 1000); // Reduced to 1 second for instant feel
+  inboxInterval = setInterval(checkInbox, 1000); 
 }
 
 async function checkInbox(){
@@ -244,30 +243,33 @@ function openPMPopup(sender, text, senderData) {
   popup.style.backgroundColor = color;
   popup.style.color = txtColor;
   
-  let html = `<div class="pm-popup-header">
-                <span>${escapeHtml(sender)}</span>
-                <span class="pm-popup-close" onclick="document.getElementById('${popupId}').remove()">×</span>
-              </div>`;
-  if(text) html += `<div class="pm-popup-text">${escapeHtml(text)}</div>`;
-  
-  html += `<div class="pm-popup-footer">
-             <input type="text" class="pm-popup-input" id="input-${popupId}" placeholder="Type reply..." style="color:${txtColor};border-color:${txtColor}80;background:${color}80;" />
-             <div class="pm-popup-buttons">
-               <button style="color:${txtColor};" onclick="document.getElementById('${popupId}').remove()">Close</button>
-               <button style="color:${txtColor};" onclick="sendReply('${sender}', '${popupId}')">Send</button>
-             </div>
-           </div>`;
+  let html = `
+    <div class="pm-popup-header">
+      <span>${escapeHtml(sender)}</span>
+      <span class="pm-popup-close" onclick="document.getElementById('${popupId}').remove()">×</span>
+    </div>
+    <div class="pm-popup-text">${escapeHtml(text)}</div>
+    <div class="pm-popup-actions" id="actions-${popupId}">
+      <button style="color:#000;" onclick="viewProfile('${sender}'); document.getElementById('${popupId}').remove();">About user</button>
+      <button style="color:#000; background:rgba(255,255,255,0.9);" onclick="showReplyBox('${popupId}', '${sender}')">Reply</button>
+    </div>
+    <div class="pm-popup-reply-box hidden" id="reply-${popupId}">
+      <input type="text" id="input-${popupId}" placeholder="Type reply..." style="color:#000;" />
+      <button style="background:#fff;color:#000;padding:10px 15px;border:none;border-radius:6px;font-weight:bold;" onclick="sendReply('${sender}', '${popupId}')">Send</button>
+    </div>
+  `;
            
   popup.innerHTML = html;
   el('pm-popup-root').appendChild(popup);
-  
-  setTimeout(() => {
-    const inp = document.getElementById(`input-${popupId}`);
-    if(inp) {
-      inp.focus();
-      inp.addEventListener('keydown', e => { if(e.key==='Enter') sendReply(sender, popupId); });
-    }
-  }, 100);
+}
+
+function showReplyBox(popupId, sender) {
+  document.getElementById(`actions-${popupId}`).classList.add('hidden');
+  const replyBox = document.getElementById(`reply-${popupId}`);
+  replyBox.classList.remove('hidden');
+  const inp = document.getElementById(`input-${popupId}`);
+  inp.focus();
+  inp.addEventListener('keydown', e => { if(e.key==='Enter') sendReply(sender, popupId); });
 }
 
 async function sendReply(sender, popupId) {
@@ -468,8 +470,13 @@ window.sendPMFromHistory=async(u)=>{
 
 window.startNewPM=(u)=>{
   fetch(API+'/api/user?username='+u).then(res=>res.json()).then(data=>{
-    if(data.success) openPMPopup(u, null, data.user);
-    else alert("User not found");
+    if(data.success) {
+      openPMPopup(u, "", data.user);
+      const popupId = document.querySelector('.pm-popup-card').id;
+      showReplyBox(popupId, u);
+    } else {
+      alert("User not found");
+    }
   });
 };
 
