@@ -96,10 +96,10 @@
   .p-color-opt{width:20px;height:20px;border-radius:50%;cursor:pointer;border:2px solid transparent;}
   .p-color-opt.selected{border-color:var(--ink);}
 
-  /* View Profile Styles (Mockup Design - Fixed Order) */
+  /* View Profile Styles (Labels Left, Values Right) */
   .vp-row{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #f4f5f7;padding:8px 0;}
-  .vp-label{width:50%;font-size:12px;color:var(--muted);font-weight:600;text-align:right;border-right:1px solid var(--line);padding-right:10px;}
-  .vp-val{width:50%;display:flex;justify-content:flex-start;padding-left:10px;}
+  .vp-label{width:50%;font-size:12px;color:var(--muted);font-weight:600;text-align:left;border-right:1px solid var(--line);padding-right:10px;}
+  .vp-val{width:50%;display:flex;justify-content:flex-end;padding-left:10px;}
   .vp-bubble{background:var(--dot-soft);color:var(--dot);padding:4px 12px;border-radius:20px;font-weight:700;font-size:12px;text-align:center;}
   .vp-btn-row{display:flex;gap:5px;margin-top:16px;}
   .vp-btn{flex:1;padding:8px 4px;border:none;border-radius:6px;font-weight:700;font-size:11px;cursor:pointer;}
@@ -615,7 +615,7 @@ window.removeFriend=async(u)=>{
   }
 };
 
-// View Profile Modal (Fixed Order: Label left, Value right)
+// View Profile Modal (Labels Left, Values Right)
 window.viewProfile=async(u)=>{
   const r=await fetch(API+'/api/user?username='+u);
   const d=await r.json();
