@@ -82,9 +82,9 @@
   .pm-history-msg b{font-size:10px;display:block;margin-bottom:2px;opacity:0.8;}
 
   /* Profile Mockup Styles */
-  .p-row{display:flex;align-items:center;border-bottom:1px solid #f4f5f7;padding:10px 0;}
+  .p-row{display:flex;align-items:center;border-bottom:1px solid #f4f5f7;padding:10px 0;min-height:40px;}
   .p-label{width:45%;font-size:13px;color:var(--muted);font-weight:600;border-right:1px solid var(--line);padding-right:10px;}
-  .p-val{width:55%;padding-left:10px;display:flex;justify-content:flex-end;}
+  .p-val{width:55%;padding-left:10px;display:flex;justify-content:flex-end;align-items:center;}
   .p-input, .p-select{width:100%;max-width:140px;border:1px solid var(--line);border-radius:6px;padding:6px 10px;font-size:13px;background:#f9f9f9;outline:none;text-align:right;}
   .p-input:focus, .p-select:focus{border-color:var(--dot);background:#fff;}
   .p-bubble{background:var(--dot-soft);color:var(--dot);padding:6px 16px;border-radius:20px;font-weight:700;font-size:13px;text-align:center;}
@@ -92,6 +92,11 @@
   .p-btn{flex:1;padding:10px;border:none;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer;}
   .p-btn-save{background:var(--dot);color:#fff;}
   .p-btn-logout{background:transparent;color:var(--danger);border:1px solid var(--danger);}
+  
+  /* Color Circles Grid */
+  .p-color-grid{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end;max-width:140px;}
+  .p-color-opt{width:20px;height:20px;border-radius:50%;cursor:pointer;border:2px solid transparent;}
+  .p-color-opt.selected{border-color:var(--ink);}
 </style>
 </head>
 <body>
@@ -150,7 +155,8 @@
 const API = "https://dotverse-api.erfanzrd98.workers.dev";
 let currentUser = null, currentRoom = "1", msgInterval = null, inboxInterval = null, lastInboxId = 0;
 const AVATARS = ["🦊","🦄","🐰","🐭","🍄","☢️","🌼","♥️","♠️","♣️","♦️","👺","👻","👽","⛄","💀","👤","🧑🏻‍🚀","🧒🏻","👩🏻","🍁","🍀","🌲","⚡","🐥","🛡️","♂️","♀️"];
-const COLORS = ["#000000","#2563eb","#dc2626","#16a34a","#9333ea","#ea580c","#0891b2","#db2777","#f5780e"];
+// Added more colors
+const COLORS = ["#000000", "#ef4444", "#f97316", "#eab308", "#22c55e", "#06b6d4", "#3b82f6", "#8b5cf6", "#ec4899", "#6b7280", "#f5780e"];
 
 function el(id){return document.getElementById(id);}
 function escapeHtml(s){const d=document.createElement('div');d.textContent=s??'';return d.innerHTML;}
@@ -170,7 +176,7 @@ function getPmColor(user) {
 }
 
 function getTextColor(bgColor) {
-    const darkColors = ['#1d4ed8', '#dc2626', '#7c3aed', '#4b5563', '#f5780e'];
+    const darkColors = ['#1d4ed8', '#dc2626', '#7c3aed', '#4b5563', '#f5780e', '#000000', '#ef4444', '#f97316', '#eab308', '#22c55e', '#06b6d4', '#3b82f6', '#8b5cf6', '#ec4899', '#6b7280'];
     return darkColors.includes(bgColor) ? '#ffffff' : '#000000';
 }
 
@@ -368,7 +374,7 @@ async function createRoomPrompt(){
   if(d.success){alert('Room created!');closeModal();loadRooms();}else{alert(d.message);}
 }
 
-// New Profile Modal Design
+// Profile Modal Design
 el('tb-profile').onclick=()=>{
   const isMaster = currentUser.isDotMaster === 1;
   let avHtml;
@@ -380,9 +386,9 @@ el('tb-profile').onclick=()=>{
     </select>`;
   }
 
-  let coHtml = `<select id="p-color" class="p-select" onchange="window._co=this.value">
-    ${COLORS.map(c => `<option value="${c}" ${currentUser.nameColor===c?'selected':''}>${c}</option>`).join('')}
-  </select>`;
+  let coHtml = `<div class="p-color-grid" id="p-color-grid">
+    ${COLORS.map(c => `<span class="p-color-opt ${currentUser.nameColor===c?'selected':''}" style="background:${c}" onclick="selColor('${c}', this)"></span>`).join('')}
+  </div>`;
 
   let genderHtml = `<select id="p-gender" class="p-select" onchange="window._gender=this.value">
     <option value="male" ${currentUser.gender==='male'?'selected':''}>Male</option>
@@ -436,6 +442,12 @@ el('tb-profile').onclick=()=>{
   window._av=currentUser.avatar;
   window._co=currentUser.nameColor;
   window._gender=currentUser.gender;
+};
+
+window.selColor=(c,e)=>{
+  window._co=c;
+  e.parentElement.querySelectorAll('.p-color-opt').forEach(x=>x.classList.remove('selected'));
+  e.classList.add('selected');
 };
 
 window.saveProfile=async()=>{
