@@ -81,7 +81,7 @@
   .pm-history-msg{max-width:80%;padding:8px 12px;border-radius:8px;font-size:13px;word-break:break-word;}
   .pm-history-msg b{font-size:10px;display:block;margin-bottom:2px;opacity:0.8;}
 
-  /* Profile Mockup Styles */
+  /* Profile Styles */
   .p-row{display:flex;align-items:center;border-bottom:1px solid #f4f5f7;padding:10px 0;min-height:40px;}
   .p-label{width:45%;font-size:13px;color:var(--muted);font-weight:600;border-right:1px solid var(--line);padding-right:10px;}
   .p-val{width:55%;padding-left:10px;display:flex;justify-content:flex-end;align-items:center;}
@@ -92,11 +92,22 @@
   .p-btn{flex:1;padding:10px;border:none;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer;}
   .p-btn-save{background:var(--dot);color:#fff;}
   .p-btn-logout{background:transparent;color:var(--danger);border:1px solid var(--danger);}
-  
-  /* Color Circles Grid */
   .p-color-grid{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end;max-width:140px;}
   .p-color-opt{width:20px;height:20px;border-radius:50%;cursor:pointer;border:2px solid transparent;}
   .p-color-opt.selected{border-color:var(--ink);}
+
+  /* PM Modal Tabs & List */
+  .pm-modal-tabs{display:flex;gap:4px;margin-bottom:20px;background:#f4f5f7;border-radius:10px;padding:3px;}
+  .pm-modal-tab{flex:1;text-align:center;padding:8px 0;font-size:13.5px;font-weight:600;border-radius:8px;cursor:pointer;color:var(--muted);}
+  .pm-modal-tab.active{background:#fff;color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.1);}
+  .friend-row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid #f4f5f7;}
+  .friend-info{display:flex;align-items:center;gap:10px;}
+  .friend-av{font-size:20px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;background:var(--dot-soft);border-radius:50%;}
+  .friend-name{font-weight:600;font-size:14px;}
+  .friend-actions{display:flex;gap:4px;}
+  .act-btn{border:none;background:#f4f5f7;width:30px;height:30px;border-radius:8px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;}
+  .act-btn.danger{background:#fee2e2;color:#ef4444;}
+  .act-btn.primary{background:var(--dot);color:#fff;}
 </style>
 </head>
 <body>
@@ -128,7 +139,7 @@
 <div id="shell" class="hidden">
   <div id="topbar-mobile">
     <div class="topbar-btn" id="tb-profile"><span class="tb-icon" id="tb-profile-avatar">🙂</span><span class="tb-label">Profile</span></div>
-    <div class="topbar-btn" id="tb-pms"><span class="tb-icon">✉️</span><span class="tb-label">PMs</span></div>
+    <div class="topbar-btn" id="tb-pms"><span class="tb-icon">👥</span><span class="tb-label">PMs</span></div>
     <div class="topbar-btn" id="tb-rooms"><span class="tb-icon">💬</span><span class="tb-label">Rooms</span></div>
     <div class="topbar-btn" id="tb-dots"><span class="tb-icon">🪙</span><span class="tb-label" id="tb-dots-count">0</span></div>
     <div class="topbar-btn" id="tb-games"><span class="tb-icon">🎮</span><span class="tb-label">Games</span></div>
@@ -155,7 +166,6 @@
 const API = "https://dotverse-api.erfanzrd98.workers.dev";
 let currentUser = null, currentRoom = "1", msgInterval = null, inboxInterval = null, lastInboxId = 0;
 const AVATARS = ["🦊","🦄","🐰","🐭","🍄","☢️","🌼","♥️","♠️","♣️","♦️","👺","👻","👽","⛄","💀","👤","🧑🏻‍🚀","🧒🏻","👩🏻","🍁","🍀","🌲","⚡","🐥","🛡️","♂️","♀️"];
-// Added more colors
 const COLORS = ["#000000", "#ef4444", "#f97316", "#eab308", "#22c55e", "#06b6d4", "#3b82f6", "#8b5cf6", "#ec4899", "#6b7280", "#f5780e"];
 
 function el(id){return document.getElementById(id);}
@@ -374,7 +384,6 @@ async function createRoomPrompt(){
   if(d.success){alert('Room created!');closeModal();loadRooms();}else{alert(d.message);}
 }
 
-// Profile Modal Design
 el('tb-profile').onclick=()=>{
   const isMaster = currentUser.isDotMaster === 1;
   let avHtml;
@@ -397,42 +406,15 @@ el('tb-profile').onclick=()=>{
 
   openModal('👤 Your Profile',`
     <div style="max-width:320px;margin:0 auto;">
-      <div class="p-row">
-        <span class="p-label">Username</span>
-        <div class="p-val"><input type="text" id="p-username" class="p-input" value="${escapeHtml(currentUser.username)}"></div>
-      </div>
-      <div class="p-row">
-        <span class="p-label">Password</span>
-        <div class="p-val"><input type="password" id="p-password" class="p-input" placeholder="••••••"></div>
-      </div>
-      <div class="p-row">
-        <span class="p-label">Gender</span>
-        <div class="p-val">${genderHtml}</div>
-      </div>
-      <div class="p-row">
-        <span class="p-label">City</span>
-        <div class="p-val"><input type="text" id="p-city" class="p-input" value="${escapeHtml(currentUser.city||'')}"></div>
-      </div>
-      <div class="p-row">
-        <span class="p-label">Name color</span>
-        <div class="p-val">${coHtml}</div>
-      </div>
-      <div class="p-row">
-        <span class="p-label">Avatar</span>
-        <div class="p-val">${avHtml}</div>
-      </div>
-      <div class="p-row">
-        <span class="p-label">ID Number</span>
-        <div class="p-val"><span class="p-bubble">#${currentUser.id}</span></div>
-      </div>
-      <div class="p-row">
-        <span class="p-label">Dots</span>
-        <div class="p-val"><span class="p-bubble">${currentUser.isDotMaster?'∞':currentUser.dots}</span></div>
-      </div>
-      <div class="p-row" style="border-bottom:none;">
-        <span class="p-label">Rating</span>
-        <div class="p-val"><span class="p-bubble">${currentUser.score}</span></div>
-      </div>
+      <div class="p-row"><span class="p-label">Username</span><div class="p-val"><input type="text" id="p-username" class="p-input" value="${escapeHtml(currentUser.username)}"></div></div>
+      <div class="p-row"><span class="p-label">Password</span><div class="p-val"><input type="password" id="p-password" class="p-input" placeholder="••••••"></div></div>
+      <div class="p-row"><span class="p-label">Gender</span><div class="p-val">${genderHtml}</div></div>
+      <div class="p-row"><span class="p-label">City</span><div class="p-val"><input type="text" id="p-city" class="p-input" value="${escapeHtml(currentUser.city||'')}"></div></div>
+      <div class="p-row"><span class="p-label">Name color</span><div class="p-val">${coHtml}</div></div>
+      <div class="p-row"><span class="p-label">Avatar</span><div class="p-val">${avHtml}</div></div>
+      <div class="p-row"><span class="p-label">ID Number</span><div class="p-val"><span class="p-bubble">#${currentUser.id}</span></div></div>
+      <div class="p-row"><span class="p-label">Dots</span><div class="p-val"><span class="p-bubble">${currentUser.isDotMaster?'∞':currentUser.dots}</span></div></div>
+      <div class="p-row" style="border-bottom:none;"><span class="p-label">Rating</span><div class="p-val"><span class="p-bubble">${currentUser.score}</span></div></div>
       <div class="p-btn-row">
         <button class="p-btn p-btn-logout" onclick="location.reload()">Logout</button>
         <button class="p-btn p-btn-save" onclick="saveProfile()">Save Changes</button>
@@ -488,13 +470,63 @@ async function transferDotsPrompt(to,amt){
   if(d.success)alert('Sent!');else alert(d.message);
 }
 
+// PMs Modal with Tabs (Friends & History)
 el('tb-pms').onclick=async()=>{
   let friends=JSON.parse(currentUser.friends||'[]');
-  let rows='<p style="color:var(--muted);text-align:center;font-size:13px;margin-bottom:16px;">Select a user to view chat history.</p>';
-  if(friends.length===0) rows='<p style="color:var(--muted);text-align:center;">No friends yet. Tap a user in chat to add them.</p>';
-  friends.forEach(f=>{rows+=`<div class="list-row" onclick="showPMHistory('${f}')"><span style="flex:1;font-weight:600;">${escapeHtml(f)}</span><span>💬</span></div>`;});
-  rows+=`<button class="btn" style="margin-top:16px;" onclick="startNewPM()">Start New PM</button>`;
-  openModal('Private Messages',rows);
+  
+  let friendsHtml = friends.length === 0 ? '<p style="color:var(--muted);text-align:center;font-size:13px;padding:20px 0;">No friends yet. Tap a user in chat to add them.</p>' : friends.map(f => `
+    <div class="friend-row">
+      <div class="friend-info">
+        <span class="friend-av">👤</span>
+        <span class="friend-name">${escapeHtml(f)}</span>
+      </div>
+      <div class="friend-actions">
+        <button class="act-btn" title="View Profile" onclick="viewProfile('${f}')">👤</button>
+        <button class="act-btn" title="Send Dots" onclick="sendDotsPrompt('${f}')">🪙</button>
+        <button class="act-btn danger" title="Remove Friend" onclick="removeFriend('${f}')">➖</button>
+        <button class="act-btn primary" title="Send PM" onclick="startNewPM('${f}')">💬</button>
+      </div>
+    </div>
+  `).join('');
+
+  openModal('👥 Private Messages',`
+    <div class="pm-modal-tabs">
+      <div class="pm-modal-tab active" onclick="switchPMTab('friends', this)">Friends List</div>
+      <div class="pm-modal-tab" onclick="switchPMTab('history', this)">History</div>
+    </div>
+    <div id="pm-tab-friends">${friendsHtml}</div>
+    <div id="pm-tab-history" class="hidden"><p style="color:var(--muted);text-align:center;font-size:13px;padding:20px 0;">Loading history...</p></div>
+    <button class="btn" style="margin-top:16px;" onclick="startNewPM()">Start New PM</button>
+  `);
+  
+  // Fetch history
+  try {
+    const r = await fetch(`${API}/api/pm-contacts?username=${currentUser.username}`);
+    const d = await r.json();
+    let historyHtml = '';
+    if(d.success && d.contacts.length > 0) {
+      historyHtml = d.contacts.map(c => `
+        <div class="friend-row" onclick="showPMHistory('${c}')" style="cursor:pointer;">
+          <div class="friend-info">
+            <span class="friend-av">💬</span>
+            <span class="friend-name">${escapeHtml(c)}</span>
+          </div>
+          <span style="font-size:12px;color:var(--muted)">Tap to chat</span>
+        </div>
+      `).join('');
+    } else {
+      historyHtml = '<p style="color:var(--muted);text-align:center;font-size:13px;padding:20px 0;">No history yet.</p>';
+    }
+    const histDiv = document.getElementById('pm-tab-history');
+    if(histDiv) histDiv.innerHTML = historyHtml;
+  } catch(e) {}
+};
+
+window.switchPMTab=(tab, btn)=>{
+  document.querySelectorAll('.pm-modal-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('pm-tab-friends').classList.toggle('hidden', tab !== 'friends');
+  document.getElementById('pm-tab-history').classList.toggle('hidden', tab !== 'history');
 };
 
 window.showPMHistory=async(u)=>{
@@ -542,6 +574,8 @@ window.sendPMFromHistory=async(u)=>{
 };
 
 window.startNewPM=(u)=>{
+  if(!u) u = prompt('Enter username to send a PM:');
+  if(!u) return;
   fetch(API+'/api/user?username='+u).then(res=>res.json()).then(data=>{
     if(data.success) {
       openPMPopup(u, "", data.user);
@@ -556,7 +590,20 @@ window.startNewPM=(u)=>{
 window.addFriend=async(u)=>{
   const r=await fetch(API+'/api/add-friend',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:currentUser.username,friend:u})});
   const d=await r.json();
-  if(d.success){currentUser.friends=JSON.stringify([...JSON.parse(currentUser.friends||'[]'),u]);alert('Added!');}
+  if(d.success){
+    currentUser.friends=JSON.stringify([...JSON.parse(currentUser.friends||'[]'),u]);
+    alert('Added!');
+  }
+};
+
+window.removeFriend=async(u)=>{
+  const r=await fetch(API+'/api/remove-friend',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:currentUser.username,friend:u})});
+  const d=await r.json();
+  if(d.success){
+    currentUser.friends=JSON.stringify(JSON.parse(currentUser.friends||'[]').filter(f=>f!==u));
+    alert('Removed!');
+    el('tb-pms').click(); // Refresh modal
+  }
 };
 
 window.viewProfile=async(u)=>{
