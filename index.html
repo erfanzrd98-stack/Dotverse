@@ -184,7 +184,7 @@ el('btn-login').onclick = async () => {
   }catch(e){showMsg('Network error');}
 };
 
-function startApp(){
+async function startApp(){
   el('auth-screen').classList.add('hidden');
   el('shell').classList.remove('hidden');
   if(currentUser.isDotMaster===1) el('tb-admin').classList.remove('hidden');
@@ -192,6 +192,14 @@ function startApp(){
   loadRooms();
   joinRoom('1');
   setInterval(loadRooms, 10000);
+  
+  // FIX: Get the latest PM ID on login so old messages don't popup
+  try {
+    const rInit = await fetch(`${API}/api/get-last-pm-id?username=${currentUser.username}`);
+    const dInit = await rInit.json();
+    if(dInit.success) lastInboxId = dInit.lastId || 0;
+  } catch(e) {}
+  
   startInboxPolling();
 }
 
@@ -204,7 +212,7 @@ function updateTopBar(){
 function startInboxPolling(){
   if(inboxInterval) clearInterval(inboxInterval);
   checkInbox();
-  inboxInterval = setInterval(checkInbox, 3000);
+  inboxInterval = setInterval(checkInbox, 1000); // Reduced to 1 second for instant feel
 }
 
 async function checkInbox(){
@@ -455,7 +463,7 @@ window.sendPMFromHistory=async(u)=>{
   const inp=document.getElementById('pm-history-input');
   const t=inp.value.trim();if(!t)return;
   await fetch(API+'/api/send-pm',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sender:currentUser.username,receiver:u,text:t})});
-  showPMHistory(u); // Reload history
+  showPMHistory(u); 
 };
 
 window.startNewPM=(u)=>{
