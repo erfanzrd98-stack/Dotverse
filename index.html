@@ -81,7 +81,7 @@
   .pm-history-msg{max-width:80%;padding:8px 12px;border-radius:8px;font-size:13px;word-break:break-word;}
   .pm-history-msg b{font-size:10px;display:block;margin-bottom:2px;opacity:0.8;}
 
-  /* Profile Styles */
+  /* My Profile Styles */
   .p-row{display:flex;align-items:center;border-bottom:1px solid #f4f5f7;padding:10px 0;min-height:40px;}
   .p-label{width:45%;font-size:13px;color:var(--muted);font-weight:600;border-right:1px solid var(--line);padding-right:10px;}
   .p-val{width:55%;padding-left:10px;display:flex;justify-content:flex-end;align-items:center;}
@@ -95,6 +95,17 @@
   .p-color-grid{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end;max-width:140px;}
   .p-color-opt{width:20px;height:20px;border-radius:50%;cursor:pointer;border:2px solid transparent;}
   .p-color-opt.selected{border-color:var(--ink);}
+
+  /* View Profile Styles (Mockup Design) */
+  .vp-row{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #f4f5f7;padding:8px 0;}
+  .vp-val{width:50%;display:flex;justify-content:flex-start;padding-right:10px;}
+  .vp-label{width:50%;font-size:12px;color:var(--muted);font-weight:600;text-align:right;border-left:1px solid var(--line);padding-left:10px;}
+  .vp-bubble{background:var(--dot-soft);color:var(--dot);padding:4px 12px;border-radius:20px;font-weight:700;font-size:12px;text-align:center;}
+  .vp-btn-row{display:flex;gap:5px;margin-top:16px;}
+  .vp-btn{flex:1;padding:8px 4px;border:none;border-radius:6px;font-weight:700;font-size:11px;cursor:pointer;}
+  .vp-btn-pm{background:var(--dot);color:#fff;}
+  .vp-btn-dots{background:#f4f5f7;color:var(--ink);}
+  .vp-btn-friend{background:#eef0ff;color:var(--dot);}
 
   /* PM Modal Tabs & List */
   .pm-modal-tabs{display:flex;gap:4px;margin-bottom:20px;background:#f4f5f7;border-radius:10px;padding:3px;}
@@ -470,7 +481,6 @@ async function transferDotsPrompt(to,amt){
   if(d.success)alert('Sent!');else alert(d.message);
 }
 
-// PMs Modal with Tabs (Friends & History)
 el('tb-pms').onclick=async()=>{
   let friends=JSON.parse(currentUser.friends||'[]');
   
@@ -499,7 +509,6 @@ el('tb-pms').onclick=async()=>{
     <button class="btn" style="margin-top:16px;" onclick="startNewPM()">Start New PM</button>
   `);
   
-  // Fetch history
   try {
     const r = await fetch(`${API}/api/pm-contacts?username=${currentUser.username}`);
     const d = await r.json();
@@ -602,24 +611,63 @@ window.removeFriend=async(u)=>{
   if(d.success){
     currentUser.friends=JSON.stringify(JSON.parse(currentUser.friends||'[]').filter(f=>f!==u));
     alert('Removed!');
-    el('tb-pms').click(); // Refresh modal
+    el('tb-pms').click(); 
   }
 };
 
+// View Profile Modal (Mockup Design)
 window.viewProfile=async(u)=>{
-  const r=await fetch(API+'/api/user?username='+u);const d=await r.json();
+  const r=await fetch(API+'/api/user?username='+u);
+  const d=await r.json();
   if(d.success){
-    const u=d.user;
-    openModal('Profile',`
-      <div style="text-align:center;font-size:40px;margin-bottom:10px;">${u.avatar}</div>
-      <div class="list-row"><span>Username</span><b>${u.username}</b></div>
-      <div class="list-row"><span>ID</span><b>#${u.id}</b></div>
-      <div class="list-row"><span>Score</span><b>${u.score}</b></div>
-      <div class="list-row"><span>Dots</span><b>${u.isDotMaster?'∞':u.dots}</b></div>
-      ${u.banUntil>Date.now()?`<button class="btn btn-danger" style="margin-top:12px;" onclick="payFine('${u.username}',${u.banFine})">Pay Fine (${u.banFine} dots)</button>`:''}
+    const uData = d.user;
+    const isBanned = uData.banUntil > Date.now();
+    const isFriend = (currentUser.friends && JSON.parse(currentUser.friends).includes(uData.username));
+    
+    openModal('👤 User Profile',`
+      <div style="max-width:260px;margin:0 auto;">
+        <div class="vp-row">
+          <div class="vp-val"><span class="vp-bubble">${escapeHtml(uData.username)}</span></div>
+          <span class="vp-label">Username</span>
+        </div>
+        <div class="vp-row">
+          <div class="vp-val"><span class="vp-bubble">#${uData.id}</span></div>
+          <span class="vp-label">ID Number</span>
+        </div>
+        <div class="vp-row">
+          <div class="vp-val"><span class="vp-bubble">${uData.score}</span></div>
+          <span class="vp-label">Score</span>
+        </div>
+        <div class="vp-row">
+          <div class="vp-val"><span class="vp-bubble">${uData.gender === 'female' ? 'Female' : 'Male'}</span></div>
+          <span class="vp-label">Gender</span>
+        </div>
+        <div class="vp-row">
+          <div class="vp-val"><span class="vp-bubble">${escapeHtml(uData.city || 'Unknown')}</span></div>
+          <span class="vp-label">City</span>
+        </div>
+        <div class="vp-row">
+          <div class="vp-val"><span class="vp-bubble">${uData.isDotMaster?'∞':uData.dots}</span></div>
+          <span class="vp-label">Dots</span>
+        </div>
+        <div class="vp-row" style="border-bottom:none;">
+          <div class="vp-val"><span class="vp-bubble">${uData.joinDate || 'Unknown'}</span></div>
+          <span class="vp-label">Join Date</span>
+        </div>
+        
+        ${isBanned ? `<button class="btn btn-danger" style="margin-top:16px;width:100%;font-size:12px;padding:8px;" onclick="payFine('${uData.username}',${uData.banFine})">Pay Fine (${uData.banFine} dots)</button>` : `
+        <div class="vp-btn-row">
+          ${isFriend ? `<button class="vp-btn vp-btn-dots" onclick="removeFriend('${uData.username}');closeModal();">➖ Remove</button>` : `<button class="vp-btn vp-btn-friend" onclick="addFriend('${uData.username}');closeModal();">➕ Friend</button>`}
+          <button class="vp-btn vp-btn-dots" onclick="sendDotsPrompt('${uData.username}');closeModal();">🪙 Dots</button>
+          <button class="vp-btn vp-btn-pm" onclick="startNewPM('${uData.username}');closeModal();">💬 PM</button>
+        </div>`}
+      </div>
     `);
+  } else {
+    alert("User not found");
   }
 };
+
 window.payFine=async(u,fine)=>{
   if(currentUser.dots<fine)return alert('Not enough dots');
   const r=await fetch(API+'/api/admin/unban',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({target:u})});
