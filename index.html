@@ -22,7 +22,7 @@
   .tab.active{background:#fff;color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.1);}
   label.field{display:block;font-size:12.5px;font-weight:600;color:var(--muted);margin:14px 0 6px;}
   input,select{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:10px;font-size:14.5px;outline:none;background:#fbfbfc;}
-  input:focus{border-color:var(--dot);background:#fff;}
+  input:focus,select:focus{border-color:var(--dot);background:#fff;}
   .btn{padding:12px 0;border:none;border-radius:10px;cursor:pointer;font-size:14.5px;font-weight:700;width:100%;background:var(--dot);color:#fff;margin-top:20px;}
   .btn-sm{padding:7px 12px;font-size:12.5px;border-radius:8px;background:#f4f5f7;color:var(--ink);width:auto;margin:0;}
   .btn-danger{background:#ef4444;color:#fff;}
@@ -137,7 +137,7 @@
 <script>
 const API = "https://dotverse-api.erfanzrd98.workers.dev";
 let currentUser = null, currentRoom = "1", msgInterval = null, inboxInterval = null, lastInboxId = 0;
-const AVATARS = ["🙂","😎","🐱","🐼","🦊","🐸","👽","🤖","🌟","🔥","🍀","🌙","👑"];
+const AVATARS = ["🦊","🦄","🐰","🐭","🍄","☢️","🌼","♥️","♠️","♣️","♦️","👺","👻","👽","⛄","💀","👤","🧑🏻‍🚀","🧒🏻","👩🏻","🍁","🍀","🌲","⚡","🐥","🛡️","♂️","♀️"];
 const COLORS = ["#000000","#2563eb","#dc2626","#16a34a","#9333ea","#ea580c","#0891b2","#db2777","#f5780e"];
 
 function el(id){return document.getElementById(id);}
@@ -204,7 +204,6 @@ async function startApp(){
 }
 
 function updateTopBar(){
-  // Force crown for DotMaster in topbar
   el('tb-profile-avatar').textContent = currentUser.isDotMaster===1 ? '👑' : (currentUser.avatar||'🙂');
   el('tb-dots-count').textContent = currentUser.isDotMaster?'∞':currentUser.dots;
 }
@@ -361,15 +360,21 @@ async function createRoomPrompt(){
 }
 
 el('tb-profile').onclick=()=>{
-  // Disable avatar selection for DotMaster
   const isMaster = currentUser.isDotMaster === 1;
-  let avHtml = isMaster ? `<div style="text-align:center;font-size:40px;margin-bottom:10px;">👑</div><p style="text-align:center;color:var(--muted);font-size:12px;margin-bottom:16px;">Admin avatar is locked.</p>` 
-                        : AVATARS.map(a=>`<span class="avatar-emoji" style="width:36px;height:36px;font-size:18px;cursor:pointer;border:2px solid transparent;" onclick="selAvatar('${a}',this)">${a}</span>`).join('');
+  let avHtml;
+  if (isMaster) {
+    avHtml = `<select disabled style="width:100%;"><option selected>👑 (Admin Only)</option></select>`;
+  } else {
+    avHtml = `<select id="p-avatar-select" style="width:100%;" onchange="window._av=this.value">
+      ${AVATARS.map(a => `<option value="${a}" ${currentUser.avatar===a?'selected':''}>${a}</option>`).join('')}
+    </select>`;
+  }
                         
   let coHtml=COLORS.map(c=>`<span style="width:28px;height:28px;border-radius:50%;background:${c};cursor:pointer;display:inline-block;margin:2px;border:2px solid transparent;" onclick="selColor('${c}',this)"></span>`).join('');
   
   openModal('Profile',`
-    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;" id="av-grid">${avHtml}</div>
+    <label class="field">Avatar</label>
+    <div style="margin-bottom:16px;">${avHtml}</div>
     <div class="list-row"><span>User ID</span><b style="color:var(--muted)">#${currentUser.id}</b></div>
     <label class="field">Username</label><input type="text" id="p-username" value="${escapeHtml(currentUser.username)}" />
     <label class="field">New Password (leave blank to keep)</label><input type="password" id="p-password" placeholder="••••••" />
@@ -381,7 +386,6 @@ el('tb-profile').onclick=()=>{
   `);
   window._av=currentUser.avatar;window._co=currentUser.nameColor;
 };
-window.selAvatar=(a,e)=>{window._av=a;e.parentElement.querySelectorAll('.avatar-emoji').forEach(x=>x.style.border='2px solid transparent');e.style.border='2px solid var(--dot)';};
 window.selColor=(c,e)=>{window._co=c;e.parentElement.querySelectorAll('span').forEach(x=>x.style.border='2px solid transparent');e.style.border='2px solid #000';};
 window.saveProfile=async()=>{
   const r=await fetch(API+'/api/update-profile',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
