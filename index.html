@@ -4,7 +4,6 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 <title>Dotverse</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root{ --bg:#fff; --ink:#14181f; --muted:#6b7280; --line:#e7e9ee; --dot:#3d5afe; --dot-soft:#eef0ff; --danger:#e14b4b; }
   *{box-sizing:border-box;} html,body{height:100%;margin:0;font-family:"Tahoma","Arial",sans-serif;background:var(--bg);color:var(--ink);overflow:hidden;}
@@ -29,7 +28,7 @@
   .btn-danger{background:#ef4444;color:#fff;}
   .auth-msg{font-size:13px;margin-top:12px;min-height:16px;color:var(--danger);}
 
-  /* Shell */
+  /* Shell & Scrolling Fix */
   #app{height:100%; display:flex; flex-direction:column;}
   #shell{display:flex;flex-direction:column;height:100%;overflow:hidden;}
   #topbar-mobile{display:flex;justify-content:space-between;border-bottom:1px solid var(--line);background:#fff;flex-shrink:0;overflow-x:auto;}
@@ -55,7 +54,7 @@
   #composer input{flex:1;font-family:inherit;}
   #composer button{padding:0 20px;margin:0;width:auto;}
 
-  /* Modals */
+  /* Modals & Menus */
   .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;z-index:80;padding:20px;overflow-y:auto;}
   .modal-card{background:#fff;border-radius:16px;padding:26px;width:100%;max-width:380px;max-height:86vh;overflow-y:auto;box-sizing:border-box;}
   .modal-card.wide{max-width:600px;}
@@ -65,7 +64,7 @@
   .ctx-item{padding:9px 12px;font-size:13px;font-weight:600;border-radius:7px;cursor:pointer;}
   .ctx-item:hover{background:#f4f5f7;}
   
-  /* PM Popups */
+  /* Center PM Popups Stack (Classic Beveled Style) */
   #pm-popup-root{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:120;display:flex;flex-direction:column;gap:10px;align-items:center;}
   .pm-popup-card{width:fit-content;min-width:220px;max-width:320px;border:1px solid rgba(0,0,0,0.5);box-shadow:2px 3px 8px rgba(0,0,0,0.45);display:flex;flex-direction:column;background:#fff;}
   .pm-popup-header{display:flex;justify-content:space-between;align-items:center;padding:0 0 0 8px;color:#fff;font-size:14px;font-weight:bold;height:26px;}
@@ -77,12 +76,12 @@
   .pm-popup-reply-box input{flex:1;padding:4px 8px;border:1px solid #ccc;font-size:12px;outline:none;font-family:inherit;}
   .pm-popup-reply-box button{width:60px;color:#000;border:2px outset;font-size:12px;cursor:pointer;font-family:inherit;font-weight:bold;white-space:nowrap;}
   
-  /* PM History */
+  /* PM History View */
   .pm-history-view{display:flex;flex-direction:column;gap:8px;max-height:50vh;overflow-y:auto;padding:10px;background:#f9f9f9;border-radius:8px;margin-bottom:16px;}
   .pm-history-msg{max-width:80%;padding:8px 12px;border-radius:8px;font-size:13px;word-break:break-word;color:#000;}
   .pm-history-msg b{font-size:10px;display:block;margin-bottom:2px;opacity:0.8;}
 
-  /* Profile */
+  /* My Profile Styles */
   .p-row{display:flex;align-items:center;border-bottom:1px solid #f4f5f7;padding:10px 0;min-height:40px;}
   .p-label{width:45%;font-size:13px;color:var(--muted);font-weight:600;border-right:1px solid var(--line);padding-right:10px;text-align:right;}
   .p-val{width:55%;padding-left:10px;display:flex;justify-content:flex-end;align-items:center;}
@@ -97,7 +96,7 @@
   .p-color-opt{width:20px;height:20px;border-radius:50%;cursor:pointer;border:2px solid transparent;}
   .p-color-opt.selected{border-color:var(--ink);}
 
-  /* View Profile */
+  /* View Profile Styles (Labels Left, Values Right) */
   .vp-card{width:260px;background:#fff;border-radius:12px;padding:16px;box-shadow:0 4px 15px rgba(0,0,0,0.05); margin:0 auto;}
   .vp-row{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #f4f5f7;padding:8px 0;}
   .vp-label{width:50%;font-size:12px;color:var(--muted);font-weight:600;text-align:left;border-right:1px solid var(--line);padding-right:10px;}
@@ -109,7 +108,7 @@
   .vp-btn-dots{background:#f4f5f7;color:var(--ink);}
   .vp-btn-friend{background:#eef0ff;color:var(--dot);}
 
-  /* PM Modal Tabs */
+  /* PM Modal Tabs & List */
   .pm-modal-tabs{display:flex;gap:4px;margin-bottom:20px;background:#f4f5f7;border-radius:10px;padding:3px;}
   .pm-modal-tab{flex:1;text-align:center;padding:8px 0;font-size:13.5px;font-weight:600;border-radius:8px;cursor:pointer;color:var(--muted);}
   .pm-modal-tab.active{background:#fff;color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.1);}
@@ -176,11 +175,8 @@
 <div id="pm-popup-root"></div>
 
 <script>
-const SUPABASE_URL = "https://tjmkwkhacswxwbbegfpt.supabase.co";
-const SUPABASE_KEY = "sb_publishable_CYHd4GHZncactD_ckhjDDw_Q1WSC5Na";
-const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-let currentUser = null, currentRoom = "1", msgSub = null, pmSub = null;
+const API = "https://dotverse-api.erfanzrd98.workers.dev";
+let currentUser = null, currentRoom = "1", msgInterval = null, inboxInterval = null, lastInboxId = 0;
 const AVATARS = ["🦊","🦄","🐰","🐭","🍄","☢️","🌼","♥️","♠️","♣️","♦️","👺","👻","👽","⛄","💀","👤","🧑🏻‍🚀","🧒🏻","👩🏻","🍁","🍀","🌲","⚡","🐥","🛡️","♂️","♀️"];
 const COLORS = ["#000000", "#ef4444", "#f97316", "#eab308", "#22c55e", "#06b6d4", "#3b82f6", "#8b5cf6", "#ec4899", "#6b7280", "#f5780e"];
 
@@ -209,28 +205,20 @@ el('btn-register').onclick = async () => {
   const u=el('reg-username').value.trim(),p=el('reg-password').value,g=el('reg-gender').value,c=el('reg-city').value.trim();
   if(!u||!p) return showMsg('Username and password required.');
   try{
-    const { data: existing, error: errExist } = await db.from('users').select('id').eq('username', u).maybeSingle();
-    if(errExist) return showMsg('DB Error: ' + errExist.message);
-    if(existing) return showMsg('Username exists');
-    const { count, error: errCount } = await db.from('users').select('*', { count: 'exact', head: true });
-    if(errCount) return showMsg('Count Error: ' + errCount.message);
-    if(count >= 10) return showMsg('Capacity full');
-    const { data: newUser, error } = await db.from('users').insert([{ username:u, password:p, gender:g, city:c, joinDate: new Date().toLocaleDateString() }]).select().single();
-    if(error) return showMsg('Insert Error: ' + error.message);
-    currentUser = newUser; startApp();
-  }catch(e){ showMsg('Catch Error: ' + e.message); }
+    const r=await fetch(API+'/api/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:u,password:p,gender:g,city:c})});
+    const d=await r.json();
+    if(d.success){currentUser=d.user;startApp();}else{showMsg(d.message);}
+  }catch(e){showMsg('Network error');}
 };
 
 el('btn-login').onclick = async () => {
   const u=el('login-username').value.trim(),p=el('login-password').value;
   if(!u||!p) return showMsg('Enter credentials.');
   try{
-    const { data: user, error } = await db.from('users').select('*').eq('username', u).eq('password', p).maybeSingle();
-    if(error) return showMsg('DB Error: ' + error.message);
-    if(!user) return showMsg('Invalid credentials');
-    if(user.banUntil > Date.now()) return showMsg(`Banned. Fine: ${user.banFine}`);
-    currentUser = user; startApp();
-  }catch(e){ showMsg('Catch Error: ' + e.message); }
+    const r=await fetch(API+'/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:u,password:p})});
+    const d=await r.json();
+    if(d.success){currentUser=d.user;startApp();}else{showMsg(d.message);}
+  }catch(e){showMsg('Network error');}
 };
 
 async function startApp(){
@@ -241,7 +229,12 @@ async function startApp(){
   loadRooms();
   joinRoom('1');
   setInterval(loadRooms, 10000);
-  subscribeToPMs();
+  try {
+    const rInit = await fetch(`${API}/api/get-last-pm-id?username=${currentUser.username}`);
+    const dInit = await rInit.json();
+    if(dInit.success) lastInboxId = dInit.lastId || 0;
+  } catch(e) {}
+  startInboxPolling();
 }
 
 function updateTopBar(){
@@ -249,29 +242,28 @@ function updateTopBar(){
   el('tb-dots-count').textContent = currentUser.isDotMaster?'∞':currentUser.dots;
 }
 
-function subscribeToPMs() {
-  if(pmSub) db.removeChannel(pmSub);
-  pmSub = db.channel('pms-channel')
-    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'pms' }, payload => {
-      const m = payload.new;
-      if(m.receiver === currentUser.username) {
-        db.from('users').select('*').eq('username', m.sender).maybeSingle().then(({data}) => {
-          if(data) openPMPopup(m.sender, m.text, data);
-        });
-      }
-    }).subscribe();
+function startInboxPolling(){
+  if(inboxInterval) clearInterval(inboxInterval);
+  checkInbox();
+  inboxInterval = setInterval(checkInbox, 1000); 
 }
 
-function subscribeToMessages() {
-  if(msgSub) db.removeChannel(msgSub);
-  msgSub = db.channel('messages-channel')
-    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, payload => {
-      const m = payload.new;
-      if(m.room_id == currentRoom) {
-        renderMessage(m);
-        el('messages').scrollTop = el('messages').scrollHeight;
-      }
-    }).subscribe();
+async function checkInbox(){
+  if(!currentUser) return;
+  try{
+    const r=await fetch(`${API}/api/get-inbox?username=${currentUser.username}&last_id=${lastInboxId}`);
+    const d=await r.json();
+    if(d.success && d.messages.length > 0){
+      d.messages.forEach(m => {
+        lastInboxId = m.id;
+        if(m.sender !== currentUser.username){
+          fetch(API+'/api/user?username='+m.sender).then(res=>res.json()).then(data=>{
+            if(data.success) openPMPopup(m.sender, m.text, data.user);
+          });
+        }
+      });
+    }
+  }catch(e){}
 }
 
 function openPMPopup(sender, text, senderData) {
@@ -312,9 +304,7 @@ async function sendReply(sender, popupId) {
   const inp = document.getElementById(`input-${popupId}`);
   const t = inp.value.trim();
   if(!t) return;
-  const pmKey = [currentUser.username, sender].sort().join('_');
-  const { error } = await db.from('pms').insert([{ pm_key: pmKey, sender: currentUser.username, receiver: sender, text: t, timestamp: Date.now() }]);
-  if(error) alert('Error sending PM: ' + error.message);
+  await fetch(API+'/api/send-pm',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sender:currentUser.username,receiver:sender,text:t})});
   document.getElementById(popupId).remove(); 
 }
 
@@ -338,65 +328,60 @@ function closeCtx(){el('context-root').innerHTML='';}
 window.onclick=closeCtx;
 
 async function loadRooms(){
-  const { data } = await db.from('rooms').select('*').order('score', { ascending: false });
-  if(data){
-    const room = data.find(x => x.id == currentRoom);
-    if(room){ el('room-title').textContent=room.name; el('room-meta').textContent='ID: '+room.id+' · '+room.score+' pts'; }
-  }
+  try{
+    const r=await fetch(API+'/api/rooms');const d=await r.json();
+    if(d.success){const room=d.rooms.find(x=>x.id==currentRoom);if(room){el('room-title').textContent=room.name;el('room-meta').textContent='ID: '+room.id+' · '+room.score+' pts';}}
+  }catch(e){}
 }
 async function joinRoom(id){
   currentRoom=id;
-  const { data, error } = await db.from('messages').select('*').eq('room_id', id).order('id', { ascending: false }).limit(100);
-  const w=el('messages'); w.innerHTML='';
-  if(error){ w.innerHTML = `<p style="color:red;text-align:center;">Error loading messages: ${error.message}</p>`; return; }
-  if(data){
-    data.reverse().forEach(m => renderMessage(m));
-    w.scrollTop = w.scrollHeight;
-  }
-  subscribeToMessages();
+  if(msgInterval) clearInterval(msgInterval);
+  loadMessages();
+  msgInterval=setInterval(loadMessages,2000);
   closeModal();
 }
-function renderMessage(m){
-  const w = el('messages');
-  const div = document.createElement('div');
-  if(m.username==='system'){div.className='sys-msg';div.textContent=m.text;}
-  else{
-    div.className='msg';
-    div.innerHTML=`<span class="avatar-emoji" onclick="showCtx(event,'${m.username}')">${m.avatar||'🙂'}</span>
-    <div class="msg-body"><span class="msg-name" style="color:${m.nameColor||'#000'}" onclick="showCtx(event,'${m.username}')">${escapeHtml(m.username)}</span><span class="msg-text">${escapeHtml(m.text)}</span></div>`;
-  }
-  w.appendChild(div);
+async function loadMessages(){
+  try{
+    const r=await fetch(API+'/api/messages?room_id='+currentRoom);const d=await r.json();
+    if(d.success){
+      const w=el('messages');w.innerHTML='';
+      d.messages.forEach(m=>{
+        const div=document.createElement('div');
+        if(m.username==='system'){div.className='sys-msg';div.textContent=m.text;}
+        else{
+          div.className='msg';
+          div.innerHTML=`<span class="avatar-emoji" onclick="showCtx(event,'${m.username}')">${m.avatar||'🙂'}</span>
+          <div class="msg-body"><span class="msg-name" style="color:${m.nameColor||'#000'}" onclick="showCtx(event,'${m.username}')">${escapeHtml(m.username)}</span><span class="msg-text">${escapeHtml(m.text)}</span></div>`;
+        }
+        w.appendChild(div);
+      });
+      w.scrollTop=w.scrollHeight;
+    }
+  }catch(e){}
 }
 el('btn-send').onclick=async()=>{
   const t=el('msg-input').value.trim();if(!t)return;el('msg-input').value='';
-  const finalAvatar = currentUser.username === 'DotMaster' ? '👑' : currentUser.avatar;
-  const { error } = await db.from('messages').insert([{ room_id: parseInt(currentRoom), username: currentUser.username, avatar: finalAvatar, text: t, nameColor: currentUser.nameColor, timestamp: Date.now() }]);
-  if(error){ alert('Send Message Error: ' + error.message); return; }
-  const { data: roomData } = await db.from('rooms').select('score').eq('id', currentRoom).single();
-  if(roomData) { await db.from('rooms').update({ score: roomData.score + 1 }).eq('id', currentRoom); }
-  if(currentUser.username !== 'DotMaster') {
-    currentUser.score += 1;
-    let newDots = currentUser.dots;
-    if(currentUser.score % 100 === 0) newDots += 10;
-    await db.from('users').update({ score: currentUser.score, dots: newDots }).eq('username', currentUser.username);
-    updateTopBar();
-  }
+  try{
+    const r=await fetch(API+'/api/send-message',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({room_id:currentRoom,username:currentUser.username,avatar:currentUser.avatar,text:t,nameColor:currentUser.nameColor})});
+    const d=await r.json();
+    if(!d.success) alert(d.message);
+    loadMessages();
+  }catch(e){}
 };
 el('msg-input').addEventListener('keydown',e=>{if(e.key==='Enter')el('btn-send').click();});
 
 el('tb-rooms').onclick=async()=>{
-  const { data } = await db.from('rooms').select('*').order('score', { ascending: false });
+  const r=await fetch(API+'/api/rooms');const d=await r.json();
   let rows='';
-  data.forEach(r=>{const icon=r.id===1?'💬':r.id===2?'⭐':'🏠';rows+=`<div class="list-row" onclick="joinRoom('${r.id}')"><span>${icon}</span><span style="flex:1;font-weight:600;">${escapeHtml(r.name)}</span><span style="color:var(--muted)">${r.score} pts</span></div>`;});
+  d.rooms.forEach(r=>{const icon=r.id===1?'💬':r.id===2?'⭐':'🏠';rows+=`<div class="list-row" onclick="joinRoom('${r.id}')"><span>${icon}</span><span style="flex:1;font-weight:600;">${escapeHtml(r.name)}</span><span style="color:var(--muted)">${r.score} pts</span></div>`;});
   rows+=`<button class="btn" style="margin-top:16px;" onclick="createRoomPrompt()">➕ Create Room (5 dots)</button>`;
   openModal('Chat Rooms',rows);
 };
 async function createRoomPrompt(){
   const name=prompt('Room name:');if(!name)return;
-  if(currentUser.dots < 5 && !currentUser.isDotMaster) return alert('Not enough dots');
-  const { data, error } = await db.from('rooms').insert([{ name, creator: currentUser.username, owner: currentUser.username }]).select().single();
-  if(error){ alert('Create Room Error: ' + error.message); return; }
-  if(data){ alert('Room created!'); closeModal(); loadRooms(); joinRoom(data.id); }
+  const r=await fetch(API+'/api/create-room',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,creator:currentUser.username})});
+  const d=await r.json();
+  if(d.success){alert('Room created!');closeModal();loadRooms();}else{alert(d.message);}
 }
 
 el('tb-profile').onclick=()=>{
@@ -426,31 +411,22 @@ window.selColor=(c,e)=>{ window._co=c; e.parentElement.querySelectorAll('.p-colo
 window.saveProfile=async()=>{
   let finalAvatar = window._av;
   if(currentUser.isDotMaster === 1) finalAvatar = '👑';
-  const { data, error } = await db.from('users').update({ username: el('p-username').value.trim(), password: el('p-password').value || currentUser.password, avatar: finalAvatar, gender: window._gender, city: el('p-city').value, nameColor: window._co }).eq('username', currentUser.username).select().single();
-  if(data){ currentUser=data; updateTopBar(); alert('Saved!'); closeModal(); } else { alert('Save Profile Error: ' + error.message); }
+  const r=await fetch(API+'/api/update-profile',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+    username:currentUser.username, newUsername:el('p-username').value.trim(), newPassword:el('p-password').value, avatar:finalAvatar, gender:window._gender, city:el('p-city').value, nameColor:window._co
+  })});
+  const d=await r.json();
+  if(d.success){currentUser=d.user;updateTopBar();alert('Saved!');closeModal();}else{alert(d.message);}
 };
 
 el('tb-dots').onclick=()=>{
-  openModal('Transfer Dots',`
-    <label class="field">Recipient Username</label><input type="text" id="td-to" />
-    <label class="field">Amount</label><input type="number" id="td-amt" />
-    <button class="btn" onclick="transferDots()">Send</button>`);
+  openModal('Transfer Dots',`<label class="field">Recipient Username</label><input type="text" id="td-to" /><label class="field">Amount</label><input type="number" id="td-amt" /><button class="btn" onclick="transferDots()">Send</button>`);
 };
 window.transferDots=async()=>{
   const to=el('td-to').value.trim(),amt=parseInt(el('td-amt').value);
   if(!to||!amt)return alert('Invalid input');
-  const { data: recv, error: errRecv } = await db.from('users').select('*').eq('username', to).maybeSingle();
-  if(errRecv) return alert('Error: ' + errRecv.message);
-  if(!recv) return alert('User not found');
-  if(currentUser.dots < amt) return alert('Not enough dots');
-  const { error: errUpdMe } = await db.from('users').update({ dots: currentUser.dots - amt }).eq('username', currentUser.username);
-  if(errUpdMe) return alert('Error updating your dots: ' + errUpdMe.message);
-  const { error: errUpdRecv } = await db.from('users').update({ dots: recv.dots + amt }).eq('username', to);
-  if(errUpdRecv) return alert('Error updating receiver dots: ' + errUpdRecv.message);
-  const pmKey = [currentUser.username, to].sort().join('_');
-  await db.from('pms').insert([{ pm_key: pmKey, sender: 'DotMaster', receiver: to, text: `You received ${amt} dots from ${currentUser.username}!`, timestamp: Date.now() }]);
-  currentUser.dots -= amt; updateTopBar();
-  alert('Sent!'); closeModal();
+  const r=await fetch(API+'/api/transfer-dots',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({from:currentUser.username,to,amount:amt})});
+  const d=await r.json();
+  if(d.success){alert('Sent!');closeModal();}else{alert(d.message);}
 };
 window.sendDotsPrompt=(u)=>{ el('tb-dots').click(); el('td-to').value = u; };
 
@@ -474,16 +450,19 @@ el('tb-pms').onclick=async()=>{
     <div id="pm-tab-friends">${friendsHtml}</div>
     <div id="pm-tab-history" class="hidden"><p style="color:var(--muted);text-align:center;font-size:13px;padding:20px 0;">Loading...</p></div>
     <button class="btn" style="margin-top:16px;" onclick="startNewPM()">Start New PM</button>`);
-  const { data: pms, error } = await db.from('pms').select('sender, receiver').or(`sender.eq.${currentUser.username},receiver.eq.${currentUser.username}`);
-  if(error){ document.getElementById('pm-tab-history').innerHTML = '<p style="color:red;">Error loading history</p>'; return; }
-  let contacts = new Set();
-  pms.forEach(r => { if(r.sender !== currentUser.username) contacts.add(r.sender); if(r.receiver !== currentUser.username) contacts.add(r.receiver); });
-  let historyHtml = contacts.size === 0 ? '<p style="color:var(--muted);text-align:center;font-size:13px;padding:20px 0;">No history yet.</p>' : Array.from(contacts).map(c => `
-    <div class="friend-row" onclick="showPMHistory('${c}')" style="cursor:pointer;">
-      <div class="friend-info"><span class="friend-av">💬</span><span class="friend-name">${escapeHtml(c)}</span></div>
-      <span style="font-size:12px;color:var(--muted)">Tap to chat</span>
-    </div>`).join('');
-  document.getElementById('pm-tab-history').innerHTML = historyHtml;
+  try {
+    const r = await fetch(`${API}/api/pm-contacts?username=${currentUser.username}`);
+    const d = await r.json();
+    let historyHtml = '';
+    if(d.success && d.contacts.length > 0) {
+      historyHtml = d.contacts.map(c => `
+        <div class="friend-row" onclick="showPMHistory('${c}')" style="cursor:pointer;">
+          <div class="friend-info"><span class="friend-av">💬</span><span class="friend-name">${escapeHtml(c)}</span></div>
+          <span style="font-size:12px;color:var(--muted)">Tap to chat</span>
+        </div>`).join('');
+    } else { historyHtml = '<p style="color:var(--muted);text-align:center;font-size:13px;padding:20px 0;">No history yet.</p>'; }
+    document.getElementById('pm-tab-history').innerHTML = historyHtml;
+  } catch(e) {}
 };
 window.switchPMTab=(tab, btn)=>{
   document.querySelectorAll('.pm-modal-tab').forEach(t => t.classList.remove('active'));
@@ -492,12 +471,13 @@ window.switchPMTab=(tab, btn)=>{
   document.getElementById('pm-tab-history').classList.toggle('hidden', tab !== 'history');
 };
 window.showPMHistory=async(u)=>{
-  const pmKey = [currentUser.username, u].sort().join('_');
-  const { data: msgs } = await db.from('pms').select('*').eq('pm_key', pmKey).order('id', { ascending: false }).limit(50);
-  const { data: otherUser } = await db.from('users').select('*').eq('username', u).maybeSingle();
+  const rMsgs=await fetch(`${API}/api/pms?u1=${currentUser.username}&u2=${u}`);
+  const dMsgs=await rMsgs.json();
+  const rUser=await fetch(`${API}/api/user?username=${u}`);
+  const otherUser=(await rUser.json()).user;
   let historyHtml='<div class="pm-history-view" id="pm-history-container">';
-  if(msgs && msgs.length>0){
-    msgs.reverse().forEach(m=>{
+  if(dMsgs.success && dMsgs.messages.length>0){
+    dMsgs.messages.forEach(m=>{
       const isMine = m.sender === currentUser.username;
       const scheme = getPmColorScheme(isMine ? currentUser : otherUser);
       historyHtml += `<div class="pm-history-msg" style="align-self:${isMine?'flex-end':'flex-start'};background:${scheme.body};"><b>${escapeHtml(m.sender)}</b>${escapeHtml(m.text)}</div>`;
@@ -513,15 +493,13 @@ window.showPMHistory=async(u)=>{
 window.sendPMFromHistory=async(u)=>{
   const inp = document.getElementById('pm-history-input');
   const t = inp.value.trim(); if(!t) return;
-  const pmKey = [currentUser.username, u].sort().join('_');
-  const { error } = await db.from('pms').insert([{ pm_key: pmKey, sender: currentUser.username, receiver: u, text: t, timestamp: Date.now() }]);
-  if(error) alert('Error sending PM: ' + error.message);
+  await fetch(API+'/api/send-pm',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sender:currentUser.username,receiver:u,text:t})});
   showPMHistory(u); 
 };
 window.startNewPM=async(u)=>{
   if(!u) u = prompt('Enter username to send a PM:');
   if(!u) return;
-  const { data } = await db.from('users').select('*').eq('username', u).maybeSingle();
+  const { data } = await fetch(API+'/api/user?username='+u).then(res=>res.json());
   if(data) {
     openPMPopup(u, "", data);
     const popupId = document.querySelector('.pm-popup-card').id;
@@ -531,19 +509,20 @@ window.startNewPM=async(u)=>{
 window.addFriend=async(u)=>{
   let friends = JSON.parse(currentUser.friends||'[]');
   if(!friends.includes(u)) friends.push(u);
-  const { error } = await db.from('users').update({ friends: JSON.stringify(friends) }).eq('username', currentUser.username);
-  if(error) return alert('Error adding friend: ' + error.message);
+  await fetch(API+'/api/add-friend',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:currentUser.username,friend:u})});
   currentUser.friends = JSON.stringify(friends); alert('Added!');
 };
 window.removeFriend=async(u)=>{
   let friends = JSON.parse(currentUser.friends||'[]').filter(f=>f!==u);
-  const { error } = await db.from('users').update({ friends: JSON.stringify(friends) }).eq('username', currentUser.username);
-  if(error) return alert('Error removing friend: ' + error.message);
+  await fetch(API+'/api/remove-friend',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:currentUser.username,friend:u})});
   currentUser.friends = JSON.stringify(friends); alert('Removed!'); el('tb-pms').click(); 
 };
+
 window.viewProfile=async(u)=>{
-  const { data: uData } = await db.from('users').select('*').eq('username', u).maybeSingle();
-  if(uData){
+  const r=await fetch(API+'/api/user?username='+u);
+  const d=await r.json();
+  if(d.success){
+    const uData = d.user;
     const isBanned = uData.banUntil > Date.now();
     const isFriend = (currentUser.friends && JSON.parse(currentUser.friends).includes(uData.username));
     openModal('👤 User Profile',`
@@ -566,10 +545,10 @@ window.viewProfile=async(u)=>{
 };
 window.payFine=async(u,fine)=>{
   if(currentUser.dots<fine)return alert('Not enough dots');
-  const { error } = await db.from('users').update({ banUntil: 0, banFine: 0 }).eq('username', u);
-  if(error) return alert('Error paying fine: ' + error.message);
+  await fetch(API+'/api/admin/unban',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({target:u})});
   alert('User unbanned!');
 };
+
 el('tb-games').onclick=()=>{
   openModal('Roulette',`
     <label class="field">Bet Type</label>
@@ -583,24 +562,17 @@ el('tb-games').onclick=()=>{
 window.playRoulette=async()=>{
   const type=el('rl-type').value,num=el('rl-num')?parseInt(el('rl-num').value):0,amt=parseInt(el('rl-amt').value);
   if(currentUser.dots < amt) return el('rl-res').textContent='Not enough dots';
-  const res = Math.floor(Math.random() * 37);
-  let win = 0;
-  if(type==='number' && res===num) win = amt*36;
-  else if(type==='even' && res!==0 && res%2===0) win = amt*2;
-  else if(type==='odd' && res%2===1) win = amt*2;
-  else if(type==='dozen1' && res>=1 && res<=12) win = amt*3;
-  else if(type==='dozen2' && res>=13 && res<=24) win = amt*3;
-  else if(type==='dozen3' && res>=25 && res<=36) win = amt*3;
-  let delta = win - amt;
-  if(currentUser.isDotMaster) delta = win;
-  currentUser.dots += delta;
-  const { error } = await db.from('users').update({ dots: currentUser.dots }).eq('username', currentUser.username);
-  if(error) return alert('Error updating dots: ' + error.message);
-  updateTopBar();
-  el('rl-res').textContent = `Result: ${res}. ${win > 0 ? 'You won!' : 'You lost.'}`;
+  const r=await fetch(API+'/api/play-roulette',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:currentUser.username,bet:amt,type,num})});
+  const d=await r.json();
+  if(d.success){
+    currentUser=d.user;updateTopBar();
+    el('rl-res').textContent=`Result: ${d.result}. ${d.win?'You won!':'You lost.'}`;
+  }else{el('rl-res').textContent=d.message;}
 };
+
 el('tb-roominfo').onclick=async()=>{
-  const { data: room } = await db.from('rooms').select('*').eq('id', currentRoom).maybeSingle();
+  const r=await fetch(API+'/api/rooms');const d=await r.json();
+  const room=d.rooms.find(x=>x.id==currentRoom);
   if(room){
     openModal('Room Info',`
       <div class="list-row"><span>Name</span><b>${room.name}</b></div>
@@ -609,6 +581,7 @@ el('tb-roominfo').onclick=async()=>{
       <div class="list-row"><span>Creator</span><b>${room.creator}</b></div>`);
   }
 };
+
 el('tb-admin').onclick=()=>{
   openModal('Admin Panel 👑',`
     <button class="btn" onclick="adminGiveDots()">Give Dots</button>
@@ -617,21 +590,17 @@ el('tb-admin').onclick=()=>{
 window.adminGiveDots=async()=>{
   const u=prompt('Username:');if(!u)return;
   const a=prompt('Amount:');if(!a)return;
-  const { data: recv } = await db.from('users').select('dots').eq('username', u).maybeSingle();
-  if(!recv) return alert('Not found');
-  const { error } = await db.from('users').update({ dots: recv.dots + parseInt(a) }).eq('username', u);
-  if(error) return alert('Error: ' + error.message);
-  const pmKey = ['DotMaster', u].sort().join('_');
-  await db.from('pms').insert([{ pm_key: pmKey, sender: 'DotMaster', receiver: u, text: `You received ${a} dots!`, timestamp: Date.now() }]);
-  alert('Done!');
+  const r=await fetch(API+'/api/transfer-dots',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({from:'DotMaster',to:u,amount:parseInt(a)})});
+  const d=await r.json();
+  if(d.success)alert('Done!');else alert('Failed');
 };
 window.adminBan=async()=>{
   const u=prompt('Username to ban:');if(!u)return;
   const m=prompt('Minutes:');if(!m)return;
   const f=prompt('Fine (dots):');if(!f)return;
-  const { error } = await db.from('users').update({ banUntil: Date.now() + parseInt(m)*60000, banFine: parseInt(f) }).eq('username', u);
-  if(error) return alert('Error banning: ' + error.message);
-  alert('Banned!');
+  const r=await fetch(API+'/api/admin/ban',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({target:u,minutes:parseInt(m),fine:parseInt(f)})});
+  const d=await r.json();
+  if(d.success)alert('Banned!');else alert('Failed');
 };
 window.banUser=(u)=>adminBan(u);
 </script>
